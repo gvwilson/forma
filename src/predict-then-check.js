@@ -3,9 +3,9 @@ import { addHelpButton } from './help.js';
 import { mk } from './utils.js';
 
 const HELP_TEXT = {
-  en: 'Select the answer you think is correct by clicking on it. Your answer is submitted immediately and you\'ll see whether you were right.',
-  fr: 'Cliquez sur la réponse que vous pensez correcte. Votre réponse est soumise immédiatement et vous verrez si vous aviez raison.',
-  es: 'Seleccione la respuesta que crea correcta haciendo clic en ella. Su respuesta se envía de inmediato y verá si acertó.',
+  en: 'Read the code, predict what it will output, then select your answer. Use the Reveal Output button to confirm by running it yourself.',
+  fr: 'Lisez le code, prédisez ce qu\'il affichera, puis sélectionnez votre réponse. Utilisez le bouton Révéler pour confirmer en l\'exécutant vous-même.',
+  es: 'Lea el código, prediga lo que mostrará, luego seleccione su respuesta. Use el botón Revelar para confirmar ejecutándolo usted mismo.',
 };
 
 function render({ model, el }) {
@@ -13,9 +13,20 @@ function render({ model, el }) {
   const container = mk('div', 'faw');
   container.appendChild(mk('div', 'faw-question', model.get('question')));
 
+  // Code block display
+  const code = model.get('code');
+  if (code) {
+    const pre = mk('pre', 'faw-code');
+    const codeEl = mk('code');
+    codeEl.textContent = code;
+    pre.appendChild(codeEl);
+    container.appendChild(pre);
+  }
+
   const opts = mk('div', 'faw-options');
   const options = model.get('options');
   const correct = model.get('correct_answer');
+  const explanations = model.get('explanations') || [];
   let answered = false;
 
   const feedbackEl = mk('div'); feedbackEl.style.display = 'none';
@@ -38,8 +49,7 @@ function render({ model, el }) {
       feedbackEl.textContent = ok ? '✓ Correct!' : '✗ Incorrect';
       feedbackEl.className = `faw-feedback ${ok ? 'faw-correct' : 'faw-incorrect'}`;
       feedbackEl.style.display = 'block';
-      const explanations = model.get('explanations');
-      const expl = (explanations && explanations[i]) || model.get('explanation');
+      const expl = explanations[i] || model.get('explanation');
       if (expl) { explanationEl.textContent = expl; explanationEl.className = 'faw-explanation'; explanationEl.style.display = 'block'; }
       model.set('value', { selected: i, correct: ok, answered: true });
       model.save_changes();
@@ -51,18 +61,36 @@ function render({ model, el }) {
   });
 
   container.append(opts, feedbackEl, explanationEl);
+
+  // Reveal button lets the learner verify by seeing/running the actual output
+  const output = model.get('output');
+  if (output !== undefined && output !== null && output !== '') {
+    const revealBtn = mk('button', 'faw-btn faw-btn-secondary faw-reveal-btn', 'Reveal Output');
+    const outputEl = mk('pre', 'faw-output');
+    outputEl.style.display = 'none';
+    outputEl.textContent = output;
+
+    revealBtn.addEventListener('click', () => {
+      outputEl.style.display = 'block';
+      revealBtn.disabled = true;
+    });
+
+    container.append(revealBtn, outputEl);
+  }
+
   addHelpButton(container, model.get('lang'), HELP_TEXT);
   el.appendChild(container);
 }
 
-// Parse a <div class="marimo-multiple-choice"> block.
-// Supports two formats:
-//   <dl> format: <dt> are options, <dd> are per-option explanations;
-//     the correct answer is whichever <dd> starts with the word "Correct".
-//   <ol> format (legacy): <li> are options, correct index from data-correct attribute.
+// Parse a <div class="marimo-predict-then-check"> block.
+// Question from <p>; code from <pre>; actual output from <samp>.
+// Options/explanations from <dl> (dt=option, dd=explanation, "Correct" prefix = answer)
+// or from <ol> with data-correct attribute (legacy, no per-option explanations).
 export function parseHTML(div) {
   const question = div.querySelector('p')?.textContent.trim() ?? '';
   const lang = div.dataset.lang ?? 'en';
+  const code = div.querySelector('pre')?.textContent ?? '';
+  const output = div.querySelector('samp')?.textContent.trim() ?? '';
 
   const dl = div.querySelector('dl');
   if (dl) {
@@ -71,12 +99,12 @@ export function parseHTML(div) {
     const options = dts.map(dt => dt.textContent.trim());
     const explanations = dds.map(dd => dd.textContent.trim());
     const correct_answer = dds.findIndex(dd => /^correct\b/i.test(dd.textContent.trim()));
-    return { question, options, correct_answer: correct_answer === -1 ? 0 : correct_answer, explanations, lang };
+    return { question, options, correct_answer: correct_answer === -1 ? 0 : correct_answer, explanations, code, output, lang };
   }
 
   const options = [...div.querySelectorAll('li')].map(li => li.textContent.trim());
   const correct_answer = parseInt(div.dataset.correct ?? '0');
-  return { question, options, correct_answer, explanation: '', lang };
+  return { question, options, correct_answer, code, output, lang };
 }
 
 export default { render };

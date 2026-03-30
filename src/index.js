@@ -1,10 +1,12 @@
 import { createModel } from './utils.js';
-import conceptMap,     { parseHTML as parseConceptMap }     from './concept-map.js';
-import flashcard,      { parseHTML as parseFlashcard }      from './flashcard.js';
-import labeling,       { parseHTML as parseLabeling }       from './labeling.js';
-import matching,       { parseHTML as parseMatching }       from './matching.js';
-import multipleChoice, { parseHTML as parseMultipleChoice } from './multiple-choice.js';
-import ordering,       { parseHTML as parseOrdering }       from './ordering.js';
+import conceptMap,      { parseHTML as parseConceptMap }      from './concept-map.js';
+import flashcard,       { parseHTML as parseFlashcard }       from './flashcard.js';
+import labeling,        { parseHTML as parseLabeling }        from './labeling.js';
+import matching,        { parseHTML as parseMatching }        from './matching.js';
+import multipleChoice,  { parseHTML as parseMultipleChoice }  from './multiple-choice.js';
+import numericEntry,    { parseHTML as parseNumericEntry }    from './numeric-entry.js';
+import ordering,        { parseHTML as parseOrdering }        from './ordering.js';
+import predictThenCheck,{ parseHTML as parsePredictThenCheck }from './predict-then-check.js';
 
 export { createModel };
 
@@ -28,18 +30,28 @@ export function renderMultipleChoice(el, config) {
   multipleChoice.render({ model: createModel(config), el });
 }
 
+export function renderNumericEntry(el, config) {
+  numericEntry.render({ model: createModel(config), el });
+}
+
 export function renderOrdering(el, config) {
   ordering.render({ model: createModel(config), el });
 }
 
+export function renderPredictThenCheck(el, config) {
+  predictThenCheck.render({ model: createModel(config), el });
+}
+
 // Map each identifying CSS class to its [render, parseHTML] pair.
 const WIDGETS = {
-  'marimo-concept-map':     [conceptMap.render,     parseConceptMap],
-  'marimo-flashcard':       [flashcard.render,      parseFlashcard],
-  'marimo-labeling':        [labeling.render,       parseLabeling],
-  'marimo-matching':        [matching.render,       parseMatching],
-  'marimo-multiple-choice': [multipleChoice.render, parseMultipleChoice],
-  'marimo-ordering':        [ordering.render,       parseOrdering],
+  'marimo-concept-map':       [conceptMap.render,      parseConceptMap],
+  'marimo-flashcard':         [flashcard.render,       parseFlashcard],
+  'marimo-labeling':          [labeling.render,        parseLabeling],
+  'marimo-matching':          [matching.render,        parseMatching],
+  'marimo-multiple-choice':   [multipleChoice.render,  parseMultipleChoice],
+  'marimo-numeric-entry':     [numericEntry.render,    parseNumericEntry],
+  'marimo-ordering':          [ordering.render,        parseOrdering],
+  'marimo-predict-then-check':[predictThenCheck.render,parsePredictThenCheck],
 };
 
 // Find all widget divs under `root`, parse their HTML configuration, replace each

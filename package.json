@@ -1,5 +1,5 @@
 {
-  "name": "forma",
+  "name": "@gvwilson/forma",
   "version": "0.1.0",
   "description": "Standalone formative assessment widgets (multiple choice, flashcard, matching, ordering, labeling, concept map)",
   "type": "module",

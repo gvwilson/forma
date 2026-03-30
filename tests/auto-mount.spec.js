@@ -17,11 +17,11 @@ test.describe('autoMount: MultipleChoiceWidget', () => {
     await expect(page.locator('.faw-question')).toHaveText('What is 2 + 2?');
   });
 
-  test('options are parsed from <li> elements', async ({ page }) => {
+  test('options are parsed from <dt> elements in <dl>', async ({ page }) => {
     await expect(page.locator('.faw-option')).toHaveCount(3);
   });
 
-  test('data-correct index selects the right answer', async ({ page }) => {
+  test('correct answer identified by "Correct" prefix in <dd>', async ({ page }) => {
     await page.locator('.faw-option').nth(1).click();
     await expect(page.locator('.faw-feedback')).toHaveText('✓ Correct!');
   });
@@ -29,6 +29,12 @@ test.describe('autoMount: MultipleChoiceWidget', () => {
   test('a wrong option is marked incorrect', async ({ page }) => {
     await page.locator('.faw-option').nth(0).click();
     await expect(page.locator('.faw-feedback')).toHaveClass(/faw-incorrect/);
+  });
+
+  test('per-option explanation is shown after answering', async ({ page }) => {
+    await page.locator('.faw-option').nth(0).click();
+    await expect(page.locator('.faw-explanation')).toBeVisible();
+    await expect(page.locator('.faw-explanation')).toContainText('Wrong:');
   });
 });
 
@@ -246,5 +252,80 @@ test.describe('autoMount: ConceptMapWidget', () => {
     await page.locator('.faw-cm-node:has-text("Ice")').click();
     await page.locator('button:has-text("Check Map")').click();
     await expect(page.locator('.faw-cm-edge-row .faw-correct')).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Numeric entry
+// ---------------------------------------------------------------------------
+test.describe('autoMount: NumericEntryWidget', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/tests/fixtures/mount-numeric-entry.html');
+  });
+
+  test('original div is replaced by the widget', async ({ page }) => {
+    await expect(page.locator('.marimo-numeric-entry')).toHaveCount(0);
+    await expect(page.locator('.faw-numeric-input')).toHaveCount(1);
+  });
+
+  test('question text is parsed from <p>', async ({ page }) => {
+    await expect(page.locator('.faw-question')).toHaveText('What is 2 + 2?');
+  });
+
+  test('correct answer from data-correct is accepted', async ({ page }) => {
+    await page.locator('.faw-numeric-input').fill('4');
+    await page.locator('button:has-text("Submit")').click();
+    await expect(page.locator('.faw-feedback')).toHaveText('✓ Correct!');
+  });
+
+  test('wrong answer is marked incorrect', async ({ page }) => {
+    await page.locator('.faw-numeric-input').fill('3');
+    await page.locator('button:has-text("Submit")').click();
+    await expect(page.locator('.faw-feedback')).toHaveClass(/faw-incorrect/);
+  });
+
+  test('tolerance from data-tolerance is respected', async ({ page }) => {
+    // data-tolerance="0.01"; 4.005 is within tolerance
+    await page.locator('.faw-numeric-input').fill('4.005');
+    await page.locator('button:has-text("Submit")').click();
+    await expect(page.locator('.faw-feedback')).toHaveText('✓ Correct!');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Predict-then-check
+// ---------------------------------------------------------------------------
+test.describe('autoMount: PredictThenCheckWidget', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/tests/fixtures/mount-predict-then-check.html');
+  });
+
+  test('original div is replaced by the widget', async ({ page }) => {
+    await expect(page.locator('.marimo-predict-then-check')).toHaveCount(0);
+    await expect(page.locator('.faw-options')).toHaveCount(1);
+  });
+
+  test('question text is parsed from <p>', async ({ page }) => {
+    await expect(page.locator('.faw-question')).toHaveText('What does this code print?');
+  });
+
+  test('code block is parsed from <pre>', async ({ page }) => {
+    await expect(page.locator('.faw-code')).toBeVisible();
+    await expect(page.locator('.faw-code')).toContainText('x = 2 + 2');
+  });
+
+  test('options are parsed from <dt> elements in <dl>', async ({ page }) => {
+    await expect(page.locator('.faw-option')).toHaveCount(3);
+  });
+
+  test('correct answer identified by "Correct" prefix in <dd>', async ({ page }) => {
+    await page.locator('.faw-option').nth(1).click();
+    await expect(page.locator('.faw-feedback')).toHaveText('✓ Correct!');
+  });
+
+  test('Reveal Output shows output parsed from <samp>', async ({ page }) => {
+    await page.locator('.faw-reveal-btn').click();
+    await expect(page.locator('.faw-output')).toBeVisible();
+    await expect(page.locator('.faw-output')).toHaveText('4');
   });
 });

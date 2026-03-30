@@ -2,16 +2,18 @@
 <html><head><meta charset="utf-8"></head><body>
 <div id="root"></div>
 <script type="module">
-import widget from '/dist/widgets/multiple-choice.js';
+import widget from '/dist/widgets/predict-then-check.js';
 
 const state = {
-  question: 'What is 2 + 2?',
-  options: ['Three', 'Four', 'Five'],
+  question: 'What does this code print?',
+  code: 'x = 2 + 2\nprint(x)',
+  output: '4',
+  options: ['2', '4', '22'],
   correct_answer: 1,
   explanations: [
-    'Wrong: three is one less than four.',
-    'Correct: two plus two is four.',
-    'Wrong: five is one more than four.',
+    'Wrong: + here is addition, not string concatenation.',
+    'Correct: 2 + 2 = 4.',
+    'Wrong: that result would require string concatenation.',
   ],
   lang: 'en',
   value: null,

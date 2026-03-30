@@ -47,10 +47,16 @@ test.describe('MultipleChoiceWidget', () => {
     await expect(page.locator('.faw-feedback')).toHaveText(before);
   });
 
-  test('explanation appears after answering', async ({ page }) => {
+  test('per-option explanation appears after answering', async ({ page }) => {
     await page.locator('.faw-option').nth(1).click();
     await expect(page.locator('.faw-explanation')).toBeVisible();
-    await expect(page.locator('.faw-explanation')).toContainText('Two plus two equals four.');
+    await expect(page.locator('.faw-explanation')).toContainText('Correct: two plus two is four.');
+  });
+
+  test('per-option explanation for incorrect answer is shown', async ({ page }) => {
+    await page.locator('.faw-option').nth(0).click();
+    await expect(page.locator('.faw-explanation')).toBeVisible();
+    await expect(page.locator('.faw-explanation')).toContainText('Wrong: three is one less than four.');
   });
 
   test('model.set is called with selected index, correct flag, and answered flag', async ({ page }) => {

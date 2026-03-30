@@ -2,17 +2,13 @@
 <html><head><meta charset="utf-8"></head><body>
 <div id="root"></div>
 <script type="module">
-import widget from '/dist/widgets/multiple-choice.js';
+import widget from '/dist/widgets/numeric-entry.js';
 
 const state = {
   question: 'What is 2 + 2?',
-  options: ['Three', 'Four', 'Five'],
-  correct_answer: 1,
-  explanations: [
-    'Wrong: three is one less than four.',
-    'Correct: two plus two is four.',
-    'Wrong: five is one more than four.',
-  ],
+  correct_answer: 4,
+  tolerance: 0.01,
+  explanation: 'Two plus two equals four.',
   lang: 'en',
   value: null,
 };
