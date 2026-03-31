@@ -10,38 +10,38 @@ const HELP_TEXT = {
 
 function render({ model, el }) {
   const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'faw');
-  container.appendChild(mk('div', 'faw-question', model.get('question')));
-  container.appendChild(mk('div', 'faw-instructions', 'Drag label numbers to text lines. Drag outside to remove.'));
+  const container = mk('div', 'forma');
+  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  container.appendChild(mk('div', 'forma-instructions', 'Drag label numbers to text lines. Drag outside to remove.'));
 
   const labels = model.get('labels'), textLines = model.get('text_lines'), correctLabels = model.get('correct_labels');
   const placed = {};
   let submitted = false;
 
-  const area = mk('div', 'faw-labeling-area');
-  const labelsCol = mk('div', 'faw-labeling-labels'), textCol = mk('div', 'faw-labeling-text');
-  labelsCol.appendChild(mk('div', 'faw-labeling-title', 'Available Labels:'));
-  textCol.appendChild(mk('div', 'faw-labeling-title', 'Text:'));
+  const area = mk('div', 'forma-labeling-area');
+  const labelsCol = mk('div', 'forma-labeling-labels'), textCol = mk('div', 'forma-labeling-text');
+  labelsCol.appendChild(mk('div', 'forma-labeling-title', 'Available Labels:'));
+  textCol.appendChild(mk('div', 'forma-labeling-title', 'Text:'));
 
   labels.forEach((text, i) => {
-    const item = mk('div', 'faw-label-item');
-    const num = mk('span', 'faw-label-num', i + 1); num.draggable = true;
-    num.addEventListener('dragstart', e => { if (submitted) return; e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setData('text/plain', i); num.classList.add('faw-dragging'); });
-    num.addEventListener('dragend', () => num.classList.remove('faw-dragging'));
-    item.append(num, mk('span', 'faw-label-text', text));
+    const item = mk('div', 'forma-label-item');
+    const num = mk('span', 'forma-label-num', i + 1); num.draggable = true;
+    num.addEventListener('dragstart', e => { if (submitted) return; e.dataTransfer.effectAllowed = 'copy'; e.dataTransfer.setData('text/plain', i); num.classList.add('forma-dragging'); });
+    num.addEventListener('dragend', () => num.classList.remove('forma-dragging'));
+    item.append(num, mk('span', 'forma-label-text', text));
     labelsCol.appendChild(item);
   });
 
-  const linesEl = mk('div', 'faw-text-lines');
+  const linesEl = mk('div', 'forma-text-lines');
 
   function renderBadges(zone, lineIdx) {
     zone.innerHTML = '';
     (placed[lineIdx] || []).forEach(li => {
-      const b = mk('span', 'faw-label-badge', li + 1); b.draggable = !submitted; b.dataset.labelIndex = li;
+      const b = mk('span', 'forma-label-badge', li + 1); b.draggable = !submitted; b.dataset.labelIndex = li;
       if (!submitted) {
-        b.addEventListener('dragstart', e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', JSON.stringify({ li, from: lineIdx })); b.classList.add('faw-dragging'); });
+        b.addEventListener('dragstart', e => { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', JSON.stringify({ li, from: lineIdx })); b.classList.add('forma-dragging'); });
         b.addEventListener('dragend', e => {
-          b.classList.remove('faw-dragging');
+          b.classList.remove('forma-dragging');
           if (e.clientX < textCol.getBoundingClientRect().left) {
             placed[lineIdx] = placed[lineIdx].filter(x => x !== li);
             if (!placed[lineIdx].length) delete placed[lineIdx];
@@ -54,26 +54,26 @@ function render({ model, el }) {
   }
 
   textLines.forEach((text, lineIdx) => {
-    const line = mk('div', 'faw-text-line');
-    const zone = mk('div', 'faw-label-drop-zone');
-    zone.addEventListener('dragover', e => { if (submitted) return; e.preventDefault(); zone.classList.add('faw-drop-target'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('faw-drop-target'));
+    const line = mk('div', 'forma-text-line');
+    const zone = mk('div', 'forma-label-drop-zone');
+    zone.addEventListener('dragover', e => { if (submitted) return; e.preventDefault(); zone.classList.add('forma-drop-target'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('forma-drop-target'));
     zone.addEventListener('drop', e => {
       if (submitted) return;
-      e.preventDefault(); zone.classList.remove('faw-drop-target');
+      e.preventDefault(); zone.classList.remove('forma-drop-target');
       let li, from = null;
       const raw = e.dataTransfer.getData('text/plain');
       try { const d = JSON.parse(raw); if (typeof d === 'object' && d !== null) { li = d.li; from = d.from; } else { li = d; } } catch { li = parseInt(raw); }
       if (from !== null && from !== lineIdx) {
         placed[from] = placed[from].filter(x => x !== li);
         if (!placed[from].length) delete placed[from];
-        renderBadges(linesEl.children[from].querySelector('.faw-label-drop-zone'), from);
+        renderBadges(linesEl.children[from].querySelector('.forma-label-drop-zone'), from);
       }
       if (!placed[lineIdx]) placed[lineIdx] = [];
       if (!placed[lineIdx].includes(li)) placed[lineIdx].push(li);
       renderBadges(zone, lineIdx); sync();
     });
-    line.append(zone, mk('div', 'faw-text-content', text));
+    line.append(zone, mk('div', 'forma-text-content', text));
     linesEl.appendChild(line);
   });
 
@@ -81,22 +81,22 @@ function render({ model, el }) {
   area.append(labelsCol, textCol);
   container.appendChild(area);
 
-  const submitBtn = mk('button', 'faw-btn faw-btn-primary', 'Check Labels'); submitBtn.style.marginTop = '16px';
+  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Labels'); submitBtn.style.marginTop = '16px';
   submitBtn.addEventListener('click', () => {
     if (submitted) return;
     submitted = true; submitBtn.disabled = true;
-    labelsCol.querySelectorAll('.faw-label-num').forEach(n => { n.draggable = false; n.style.cursor = 'default'; });
+    labelsCol.querySelectorAll('.forma-label-num').forEach(n => { n.draggable = false; n.style.cursor = 'default'; });
     const total = Object.values(correctLabels).reduce((s, a) => s + a.length, 0);
     let score = 0;
-    linesEl.querySelectorAll('.faw-text-line').forEach((line, lineIdx) => {
-      line.querySelectorAll('.faw-label-badge').forEach(b => {
+    linesEl.querySelectorAll('.forma-text-line').forEach((line, lineIdx) => {
+      line.querySelectorAll('.forma-label-badge').forEach(b => {
         const ok = (correctLabels[lineIdx] || []).includes(parseInt(b.dataset.labelIndex));
         if (ok) score++;
-        b.classList.add(ok ? 'faw-correct' : 'faw-incorrect');
+        b.classList.add(ok ? 'forma-correct' : 'forma-incorrect');
       });
     });
     const pct = total ? Math.round(score / total * 100) : 0;
-    container.appendChild(mk('div', `faw-feedback ${score === total ? 'faw-correct' : 'faw-incorrect'}`, `Score: ${score}/${total} correct (${pct}%)`));
+    container.appendChild(mk('div', `forma-feedback ${score === total ? 'forma-correct' : 'forma-incorrect'}`, `Score: ${score}/${total} correct (${pct}%)`));
     model.set('value', { placed_labels: placed, score, total, correct: score === total });
     model.save_changes();
   });
@@ -108,7 +108,7 @@ function render({ model, el }) {
   function sync() { if (!submitted) { model.set('value', { placed_labels: placed, score: 0, total: 0, correct: false }); model.save_changes(); } }
 }
 
-// Parse a <div class="marimo-labeling"> block.
+// Parse a <div class="forma-labeling"> block.
 // Question from the first <p>; a two-column table where column 1 is the text line
 // and column 2 is comma-separated label name(s) for that line.
 // The labels list is derived as unique names in first-appearance order.

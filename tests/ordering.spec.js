@@ -6,18 +6,18 @@ const SORTED_URL = '/tests/fixtures/ordering-sorted.html';
 test.describe('OrderingWidget', () => {
   test('renders the question text', async ({ page }) => {
     await page.goto(WRONG_URL);
-    await expect(page.locator('.faw-question')).toHaveText('Order these steps:');
+    await expect(page.locator('.forma-question')).toHaveText('Order these steps:');
   });
 
   test('renders all items', async ({ page }) => {
     await page.goto(WRONG_URL);
-    const items = page.locator('.faw-ordering-item');
+    const items = page.locator('.forma-ordering-item');
     await expect(items).toHaveCount(3);
   });
 
   test('items show sequential position numbers', async ({ page }) => {
     await page.goto(WRONG_URL);
-    const positions = page.locator('.faw-position');
+    const positions = page.locator('.forma-position');
     await expect(positions.nth(0)).toHaveText('1');
     await expect(positions.nth(1)).toHaveText('2');
     await expect(positions.nth(2)).toHaveText('3');
@@ -36,13 +36,13 @@ test.describe('OrderingWidget', () => {
   test('submitting the correct order shows ✓ Correct order! feedback', async ({ page }) => {
     await page.goto(SORTED_URL);
     await page.locator('button:has-text("Check Order")').click();
-    await expect(page.locator('.faw-feedback')).toContainText('✓ Correct order!');
+    await expect(page.locator('.forma-feedback')).toContainText('✓ Correct order!');
   });
 
   test('submitting an incorrect order shows ✗ Incorrect order feedback', async ({ page }) => {
     await page.goto(WRONG_URL);
     await page.locator('button:has-text("Check Order")').click();
-    await expect(page.locator('.faw-feedback')).toContainText('✗ Incorrect order');
+    await expect(page.locator('.forma-feedback')).toContainText('✗ Incorrect order');
   });
 
   test('Check Order button is disabled after submission', async ({ page }) => {
@@ -60,7 +60,7 @@ test.describe('OrderingWidget', () => {
   test('items are not draggable after submission', async ({ page }) => {
     await page.goto(WRONG_URL);
     await page.locator('button:has-text("Check Order")').click();
-    const draggable = await page.locator('.faw-ordering-item').nth(0).getAttribute('draggable');
+    const draggable = await page.locator('.forma-ordering-item').nth(0).getAttribute('draggable');
     expect(draggable).toBe('false');
   });
 });

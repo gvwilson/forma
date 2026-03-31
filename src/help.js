@@ -2,12 +2,12 @@ export function addHelpButton(container, lang, helpText) {
   const text = helpText[lang] || helpText['en'];
 
   const popup = document.createElement('div');
-  popup.className = 'faw-help-popup';
+  popup.className = 'forma-help-popup';
   popup.textContent = text;
   popup.hidden = true;
 
   const btn = document.createElement('button');
-  btn.className = 'faw-help-btn';
+  btn.className = 'forma-help-btn';
   btn.textContent = '?';
   btn.setAttribute('aria-label', 'Help');
 

@@ -1,16 +1,18 @@
 # forma
 
 **Forma** (short for *formative assessment*) is a standalone JavaScript package
-providing six interactive assessment widgets:
+providing eight interactive assessment widgets:
 
 | Widget | Description |
 |---|---|
-| MultipleChoice | Single-answer question with immediate feedback |
+| MultipleChoice | Single-answer question with per-option explanations and immediate feedback |
 | Flashcard | Spaced-repetition card deck with self-rating |
 | Ordering | Drag-and-drop item sequencing |
 | Matching | Drag-and-drop left-to-right pairing |
 | Labeling | Drag numbered labels onto text lines |
 | ConceptMap | Draw directed relationships between concept nodes |
+| NumericEntry | Learner types a number; correct if within a configurable tolerance |
+| PredictThenCheck | Predict code output via multiple choice, then reveal the actual output |
 
 ## Installation
 
@@ -32,13 +34,18 @@ Or load directly in HTML without a build step:
 import {
   renderMultipleChoice, renderFlashcard, renderOrdering,
   renderMatching, renderLabeling, renderConceptMap,
+  renderNumericEntry, renderPredictThenCheck,
 } from 'forma';
 
 renderMultipleChoice(document.getElementById('target'), {
   question: 'What is 2 + 2?',
   options: ['Three', 'Four', 'Five'],
-  correct_answer: 1,   // zero-based index
-  explanation: 'Two plus two equals four.',
+  correct_answer: 1,           // zero-based index
+  explanations: [
+    'Wrong: three is one less than four.',
+    'Correct: two plus two equals four.',
+    'Wrong: five is one more than four.',
+  ],
   lang: 'en',
 });
 ```
@@ -48,18 +55,18 @@ properties described below.
 
 ### Auto-mount from HTML
 
-When the bundle is loaded, it scans the page for `div.marimo-*` elements and
+When the bundle is loaded, it scans the page for `div.forma-*` elements and
 mounts the corresponding widget, replacing the markup. This lets you author
 exercises in plain HTML or Markdown:
 
 ```html
-<div class="marimo-multiple-choice" data-correct="1">
+<div class="forma-multiple-choice" data-lang="en">
   <p>What is 2 + 2?</p>
-  <ol>
-    <li>Three</li>
-    <li>Four (correct — zero-based index matches data-correct)</li>
-    <li>Five</li>
-  </ol>
+  <dl>
+    <dt>Three</dt><dd>Wrong: three is one less than four.</dd>
+    <dt>Four</dt><dd>Correct: two plus two equals four.</dd>
+    <dt>Five</dt><dd>Wrong: five is one more than four.</dd>
+  </dl>
 </div>
 
 <script type="module" src="forma.js"></script>
@@ -81,25 +88,32 @@ autoMount(document.getElementById('exercises'));
 renderMultipleChoice(el, {
   question: 'string',
   options: ['option 0', 'option 1', ...],
-  correct_answer: 0,       // zero-based index
-  explanation: 'string',   // shown after answering (optional)
-  lang: 'en',              // 'en' | 'fr' | 'es'
+  correct_answer: 0,            // zero-based index
+  explanations: [               // shown after answering (one per option)
+    'Why option 0 is wrong.',
+    'Why option 1 is wrong.',
+    ...
+  ],
+  explanation: 'string',        // fallback shown if explanations is omitted
+  lang: 'en',                   // 'en' | 'fr' | 'es'
 });
 ```
 
-**HTML**:
+**HTML** — preferred `<dl>` format (per-option explanations):
 ```html
-<div class="marimo-multiple-choice" data-correct="2" data-lang="en">
+<div class="forma-multiple-choice" data-lang="en">
   <p>Question text</p>
-  <ol>
-    <li>Option A</li>
-    <li>Option B</li>
-    <li>Option C  ← correct (index 2)</li>
-  </ol>
+  <dl>
+    <dt>Option A</dt><dd>Wrong: reason A is incorrect.</dd>
+    <dt>Option B</dt><dd>Correct: reason B is right.</dd>
+    <dt>Option C</dt><dd>Wrong: reason C is incorrect.</dd>
+  </dl>
 </div>
 ```
 
-`data-correct` is the zero-based index of the correct option.
+The `<dd>` whose text starts with the word **Correct** (case-insensitive)
+identifies the correct option; all other `<dd>` elements are shown for
+incorrect options.
 
 ### Flashcard
 
@@ -115,7 +129,7 @@ renderFlashcard(el, {
 
 **HTML**:
 ```html
-<div class="marimo-flashcard" data-lang="en">
+<div class="forma-flashcard" data-lang="en">
   <p>Deck title (optional)</p>
   <dl>
     <dt>Front of card 1</dt><dd>Back of card 1</dd>
@@ -141,7 +155,7 @@ renderOrdering(el, {
 
 **HTML**:
 ```html
-<div class="marimo-ordering" data-lang="en">
+<div class="forma-ordering" data-lang="en">
   <p>Question text</p>
   <ol>
     <li>First step (correct position)</li>
@@ -169,7 +183,7 @@ renderMatching(el, {
 
 **HTML**:
 ```html
-<div class="marimo-matching" data-lang="en">
+<div class="forma-matching" data-lang="en">
   <p>Question text</p>
   <table>
     <tr><td>Left item 1</td><td>Right item 1</td></tr>
@@ -198,7 +212,7 @@ renderLabeling(el, {
 
 **HTML**:
 ```html
-<div class="marimo-labeling" data-lang="en">
+<div class="forma-labeling" data-lang="en">
   <p>Question text</p>
   <table>
     <tr><td>Text line 1</td><td>Label name</td></tr>
@@ -228,7 +242,7 @@ renderConceptMap(el, {
 
 **HTML**:
 ```html
-<div class="marimo-concept-map" data-lang="en">
+<div class="forma-concept-map" data-lang="en">
   <p>Question text</p>
   <table>
     <tr><td>Source node</td><td>relationship</td><td>Target node</td></tr>
@@ -239,6 +253,78 @@ renderConceptMap(el, {
 
 Each row defines one correct directed edge. The node list and term list are
 inferred automatically from the table in first-appearance order.
+
+### Numeric entry
+
+**JavaScript**:
+```js
+renderNumericEntry(el, {
+  question: 'string',
+  correct_answer: 42,
+  tolerance: 0.01,      // |entered - correct| must be less than this
+  explanation: 'string', // shown after answering (optional)
+  lang: 'en',
+});
+```
+
+The answer is accepted as correct when `|entered − correct_answer| < tolerance`.
+The default tolerance is `1e-9`, suitable for exact integer answers.
+
+**HTML**:
+```html
+<div class="forma-numeric-entry" data-correct="42" data-tolerance="0.01" data-lang="en">
+  <p>Question text</p>
+</div>
+```
+
+`data-correct` is the expected numeric answer and `data-tolerance` is the
+acceptance window (defaults to `1e-9` if omitted). The learner can press
+**Enter** or click **Submit** to check their answer.
+
+### Predict-then-check
+
+**JavaScript**:
+```js
+renderPredictThenCheck(el, {
+  question: 'string',
+  code: 'x = 2 + 2\nprint(x)',   // code block shown to the learner
+  output: '4',                    // actual output revealed on demand
+  options: ['2', '4', '22'],
+  correct_answer: 1,              // zero-based index
+  explanations: [
+    'Wrong: + is addition here, not string concatenation.',
+    'Correct: 2 + 2 = 4.',
+    'Wrong: that would require string concatenation.',
+  ],
+  explanation: 'string',          // fallback if explanations is omitted
+  lang: 'en',
+});
+```
+
+The learner reads the code, selects their predicted output, and receives
+immediate feedback with a per-option explanation. A **Reveal Output** button
+(disabled after clicking) shows the actual output so the learner can verify
+by running the code themselves.
+
+**HTML** — `<dl>` format with per-option explanations:
+```html
+<div class="forma-predict-then-check" data-lang="en">
+  <p>Question text</p>
+  <pre>x = 2 + 2
+print(x)</pre>
+  <dl>
+    <dt>2</dt><dd>Wrong: + is addition here, not string concatenation.</dd>
+    <dt>4</dt><dd>Correct: 2 + 2 = 4.</dd>
+    <dt>22</dt><dd>Wrong: that would require string concatenation.</dd>
+  </dl>
+  <samp>4</samp>
+</div>
+```
+
+`<pre>` holds the code; `<samp>` holds the actual output. Options and
+explanations come from `<dl>` (same `<dd>` "Correct" prefix convention as
+MultipleChoice). A legacy `<ol>` with `data-correct` is also accepted when
+per-option explanations are not needed.
 
 ## Development
 

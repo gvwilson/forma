@@ -10,10 +10,10 @@ const HELP_TEXT = {
 
 function render({ model, el }) {
   const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'faw');
+  const container = mk('div', 'forma');
 
   const q = model.get('question');
-  if (q) container.appendChild(mk('div', 'faw-question', q));
+  if (q) container.appendChild(mk('div', 'forma-question', q));
 
   const cards = model.get('cards');
   const total = cards.length;
@@ -25,28 +25,28 @@ function render({ model, el }) {
   if (model.get('shuffle')) shuffle(queue);
 
   // Progress bar
-  const progressWrap = mk('div', 'faw-progress');
-  const progressFill = mk('div', 'faw-progress-fill'); progressFill.style.width = '0%';
+  const progressWrap = mk('div', 'forma-progress');
+  const progressFill = mk('div', 'forma-progress-fill'); progressFill.style.width = '0%';
   progressWrap.appendChild(progressFill);
   container.appendChild(progressWrap);
 
-  const counterEl = mk('div', 'faw-instructions');
+  const counterEl = mk('div', 'forma-instructions');
   container.appendChild(counterEl);
 
   // Card face
-  const cardEl = mk('div', 'faw-card faw-card-front');
+  const cardEl = mk('div', 'forma-card forma-card-front');
   container.appendChild(cardEl);
 
   // Flip button
-  const flipBtn = mk('button', 'faw-btn faw-btn-secondary', 'Flip');
+  const flipBtn = mk('button', 'forma-btn forma-btn-secondary', 'Flip');
   flipBtn.style.marginBottom = '12px';
   container.appendChild(flipBtn);
 
   // Rating buttons (hidden until flipped)
-  const ratingRow = mk('div', 'faw-rating-btns'); ratingRow.style.display = 'none';
-  const gotItBtn  = mk('button', 'faw-btn faw-btn-primary', '✓ Got it');
-  const almostBtn = mk('button', 'faw-btn faw-btn-secondary', '~ Almost');
-  const noBtn     = mk('button', 'faw-btn faw-btn-danger', '✗ No');
+  const ratingRow = mk('div', 'forma-rating-btns'); ratingRow.style.display = 'none';
+  const gotItBtn  = mk('button', 'forma-btn forma-btn-primary', '✓ Got it');
+  const almostBtn = mk('button', 'forma-btn forma-btn-secondary', '~ Almost');
+  const noBtn     = mk('button', 'forma-btn forma-btn-danger', '✗ No');
   ratingRow.append(gotItBtn, almostBtn, noBtn);
   container.appendChild(ratingRow);
 
@@ -59,7 +59,7 @@ function render({ model, el }) {
     if (queue.length === 0) return;
     const idx = queue[0];
     cardEl.textContent = cards[idx].front;
-    cardEl.className = 'faw-card faw-card-front';
+    cardEl.className = 'forma-card forma-card-front';
     flipBtn.style.display = '';
     ratingRow.style.display = 'none';
     updateCounter();
@@ -67,12 +67,12 @@ function render({ model, el }) {
 
   function showComplete() {
     cardEl.textContent = '🎉 All cards reviewed!';
-    cardEl.className = 'faw-card faw-card-back';
+    cardEl.className = 'forma-card forma-card-back';
     counterEl.textContent = `Completed ${total} card${total !== 1 ? 's' : ''}.`;
     flipBtn.style.display = 'none';
     ratingRow.style.display = 'none';
     progressFill.style.width = '100%';
-    const restartBtn = mk('button', 'faw-btn faw-btn-secondary', 'Restart');
+    const restartBtn = mk('button', 'forma-btn forma-btn-secondary', 'Restart');
     restartBtn.addEventListener('click', () => {
       done.clear();
       queue = cards.map((_, i) => i);
@@ -86,7 +86,7 @@ function render({ model, el }) {
   flipBtn.addEventListener('click', () => {
     const idx = queue[0];
     cardEl.textContent = cards[idx].back;
-    cardEl.className = 'faw-card faw-card-back';
+    cardEl.className = 'forma-card forma-card-back';
     flipBtn.style.display = 'none';
     ratingRow.style.display = 'flex';
   });
@@ -118,7 +118,7 @@ function render({ model, el }) {
   el.appendChild(container);
 }
 
-// Parse a <div class="marimo-flashcard"> block.
+// Parse a <div class="forma-flashcard"> block.
 // Optional heading comes from the first <p>; cards from <dt>/<dd> pairs in a <dl>.
 export function parseHTML(div) {
   const question = div.querySelector('p')?.textContent.trim() ?? '';

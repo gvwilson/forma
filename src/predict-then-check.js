@@ -10,20 +10,20 @@ const HELP_TEXT = {
 
 function render({ model, el }) {
   const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'faw');
-  container.appendChild(mk('div', 'faw-question', model.get('question')));
+  const container = mk('div', 'forma');
+  container.appendChild(mk('div', 'forma-question', model.get('question')));
 
   // Code block display
   const code = model.get('code');
   if (code) {
-    const pre = mk('pre', 'faw-code');
+    const pre = mk('pre', 'forma-code');
     const codeEl = mk('code');
     codeEl.textContent = code;
     pre.appendChild(codeEl);
     container.appendChild(pre);
   }
 
-  const opts = mk('div', 'faw-options');
+  const opts = mk('div', 'forma-options');
   const options = model.get('options');
   const correct = model.get('correct_answer');
   const explanations = model.get('explanations') || [];
@@ -33,7 +33,7 @@ function render({ model, el }) {
   const explanationEl = mk('div'); explanationEl.style.display = 'none';
 
   options.forEach((text, i) => {
-    const div = mk('div', 'faw-option');
+    const div = mk('div', 'forma-option');
     const radio = mk('input'); radio.type = 'radio'; radio.name = 'answer'; radio.value = i; radio.id = `opt-${i}`; radio.style.marginRight = '10px';
     const lbl = mk('label'); lbl.htmlFor = `opt-${i}`; lbl.textContent = text; lbl.style.cursor = 'pointer';
     div.append(radio, lbl);
@@ -43,14 +43,14 @@ function render({ model, el }) {
       radio.checked = true;
       answered = true;
       [...opts.children].forEach((opt, j) => {
-        opt.classList.add('faw-answered', j === correct ? 'faw-correct' : j === i ? 'faw-incorrect' : 'faw-faded');
+        opt.classList.add('forma-answered', j === correct ? 'forma-correct' : j === i ? 'forma-incorrect' : 'forma-faded');
       });
       const ok = i === correct;
       feedbackEl.textContent = ok ? '✓ Correct!' : '✗ Incorrect';
-      feedbackEl.className = `faw-feedback ${ok ? 'faw-correct' : 'faw-incorrect'}`;
+      feedbackEl.className = `forma-feedback ${ok ? 'forma-correct' : 'forma-incorrect'}`;
       feedbackEl.style.display = 'block';
       const expl = explanations[i] || model.get('explanation');
-      if (expl) { explanationEl.textContent = expl; explanationEl.className = 'faw-explanation'; explanationEl.style.display = 'block'; }
+      if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
       model.set('value', { selected: i, correct: ok, answered: true });
       model.save_changes();
     };
@@ -65,8 +65,8 @@ function render({ model, el }) {
   // Reveal button lets the learner verify by seeing/running the actual output
   const output = model.get('output');
   if (output !== undefined && output !== null && output !== '') {
-    const revealBtn = mk('button', 'faw-btn faw-btn-secondary faw-reveal-btn', 'Reveal Output');
-    const outputEl = mk('pre', 'faw-output');
+    const revealBtn = mk('button', 'forma-btn forma-btn-secondary forma-reveal-btn', 'Reveal Output');
+    const outputEl = mk('pre', 'forma-output');
     outputEl.style.display = 'none';
     outputEl.textContent = output;
 
@@ -82,7 +82,7 @@ function render({ model, el }) {
   el.appendChild(container);
 }
 
-// Parse a <div class="marimo-predict-then-check"> block.
+// Parse a <div class="forma-predict-then-check"> block.
 // Question from <p>; code from <pre>; actual output from <samp>.
 // Options/explanations from <dl> (dt=option, dd=explanation, "Correct" prefix = answer)
 // or from <ol> with data-correct attribute (legacy, no per-option explanations).

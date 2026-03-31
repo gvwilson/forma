@@ -14,15 +14,15 @@ const DEFAULT_TOLERANCE = 1e-9;
 
 function render({ model, el }) {
   const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'faw');
-  container.appendChild(mk('div', 'faw-question', model.get('question')));
+  const container = mk('div', 'forma');
+  container.appendChild(mk('div', 'forma-question', model.get('question')));
 
   const input = mk('input');
   input.type = 'number';
-  input.className = 'faw-numeric-input';
+  input.className = 'forma-numeric-input';
   input.placeholder = '…';
 
-  const submitBtn = mk('button', 'faw-btn faw-btn-primary', 'Submit');
+  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Submit');
   const feedbackEl = mk('div'); feedbackEl.style.display = 'none';
   const explanationEl = mk('div'); explanationEl.style.display = 'none';
 
@@ -40,11 +40,11 @@ function render({ model, el }) {
 
     const ok = Math.abs(entered - correct) < tolerance;
     feedbackEl.textContent = ok ? '✓ Correct!' : '✗ Incorrect';
-    feedbackEl.className = `faw-feedback ${ok ? 'faw-correct' : 'faw-incorrect'}`;
+    feedbackEl.className = `forma-feedback ${ok ? 'forma-correct' : 'forma-incorrect'}`;
     feedbackEl.style.display = 'block';
 
     const expl = model.get('explanation');
-    if (expl) { explanationEl.textContent = expl; explanationEl.className = 'faw-explanation'; explanationEl.style.display = 'block'; }
+    if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
 
     model.set('value', { entered, correct, ok, answered: true });
     model.save_changes();
@@ -53,14 +53,14 @@ function render({ model, el }) {
   submitBtn.addEventListener('click', submit);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
 
-  const row = mk('div', 'faw-numeric-row');
+  const row = mk('div', 'forma-numeric-row');
   row.append(input, submitBtn);
   container.append(row, feedbackEl, explanationEl);
   addHelpButton(container, model.get('lang'), HELP_TEXT);
   el.appendChild(container);
 }
 
-// Parse a <div class="marimo-numeric-entry" data-correct="N" data-tolerance="T"> block.
+// Parse a <div class="forma-numeric-entry" data-correct="N" data-tolerance="T"> block.
 // Question comes from the first <p>.
 export function parseHTML(div) {
   const question = div.querySelector('p')?.textContent.trim() ?? '';

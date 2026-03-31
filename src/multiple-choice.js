@@ -10,10 +10,10 @@ const HELP_TEXT = {
 
 function render({ model, el }) {
   const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'faw');
-  container.appendChild(mk('div', 'faw-question', model.get('question')));
+  const container = mk('div', 'forma');
+  container.appendChild(mk('div', 'forma-question', model.get('question')));
 
-  const opts = mk('div', 'faw-options');
+  const opts = mk('div', 'forma-options');
   const options = model.get('options');
   const correct = model.get('correct_answer');
   let answered = false;
@@ -22,7 +22,7 @@ function render({ model, el }) {
   const explanationEl = mk('div'); explanationEl.style.display = 'none';
 
   options.forEach((text, i) => {
-    const div = mk('div', 'faw-option');
+    const div = mk('div', 'forma-option');
     const radio = mk('input'); radio.type = 'radio'; radio.name = 'answer'; radio.value = i; radio.id = `opt-${i}`; radio.style.marginRight = '10px';
     const lbl = mk('label'); lbl.htmlFor = `opt-${i}`; lbl.textContent = text; lbl.style.cursor = 'pointer';
     div.append(radio, lbl);
@@ -32,15 +32,15 @@ function render({ model, el }) {
       radio.checked = true;
       answered = true;
       [...opts.children].forEach((opt, j) => {
-        opt.classList.add('faw-answered', j === correct ? 'faw-correct' : j === i ? 'faw-incorrect' : 'faw-faded');
+        opt.classList.add('forma-answered', j === correct ? 'forma-correct' : j === i ? 'forma-incorrect' : 'forma-faded');
       });
       const ok = i === correct;
       feedbackEl.textContent = ok ? '✓ Correct!' : '✗ Incorrect';
-      feedbackEl.className = `faw-feedback ${ok ? 'faw-correct' : 'faw-incorrect'}`;
+      feedbackEl.className = `forma-feedback ${ok ? 'forma-correct' : 'forma-incorrect'}`;
       feedbackEl.style.display = 'block';
       const explanations = model.get('explanations');
       const expl = (explanations && explanations[i]) || model.get('explanation');
-      if (expl) { explanationEl.textContent = expl; explanationEl.className = 'faw-explanation'; explanationEl.style.display = 'block'; }
+      if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
       model.set('value', { selected: i, correct: ok, answered: true });
       model.save_changes();
     };
@@ -55,28 +55,20 @@ function render({ model, el }) {
   el.appendChild(container);
 }
 
-// Parse a <div class="marimo-multiple-choice"> block.
-// Supports two formats:
-//   <dl> format: <dt> are options, <dd> are per-option explanations;
-//     the correct answer is whichever <dd> starts with the word "Correct".
-//   <ol> format (legacy): <li> are options, correct index from data-correct attribute.
+// Parse a <div class="forma-multiple-choice"> block.
+// Question comes from the first <p>; options from <dt> elements in a <dl>;
+// per-option explanations from <dd> elements. The correct answer is whichever
+// <dd> starts with the word "Correct" (case-insensitive).
 export function parseHTML(div) {
   const question = div.querySelector('p')?.textContent.trim() ?? '';
   const lang = div.dataset.lang ?? 'en';
-
   const dl = div.querySelector('dl');
-  if (dl) {
-    const dts = [...dl.querySelectorAll('dt')];
-    const dds = [...dl.querySelectorAll('dd')];
-    const options = dts.map(dt => dt.textContent.trim());
-    const explanations = dds.map(dd => dd.textContent.trim());
-    const correct_answer = dds.findIndex(dd => /^correct\b/i.test(dd.textContent.trim()));
-    return { question, options, correct_answer: correct_answer === -1 ? 0 : correct_answer, explanations, lang };
-  }
-
-  const options = [...div.querySelectorAll('li')].map(li => li.textContent.trim());
-  const correct_answer = parseInt(div.dataset.correct ?? '0');
-  return { question, options, correct_answer, explanation: '', lang };
+  const dts = dl ? [...dl.querySelectorAll('dt')] : [];
+  const dds = dl ? [...dl.querySelectorAll('dd')] : [];
+  const options = dts.map(dt => dt.textContent.trim());
+  const explanations = dds.map(dd => dd.textContent.trim());
+  const correct_answer = dds.findIndex(dd => /^correct\b/i.test(dd.textContent.trim()));
+  return { question, options, correct_answer: correct_answer === -1 ? 0 : correct_answer, explanations, lang };
 }
 
 export default { render };

@@ -20,9 +20,9 @@ let uid = 0;
 function render({ model, el }) {
   const id = ++uid;
   const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'faw');
-  container.appendChild(mk('div', 'faw-question', model.get('question')));
-  container.appendChild(mk('div', 'faw-instructions', 'Select a relationship term, then click two concepts to connect them. Drag concepts to rearrange.'));
+  const container = mk('div', 'forma');
+  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  container.appendChild(mk('div', 'forma-instructions', 'Select a relationship term, then click two concepts to connect them. Drag concepts to rearrange.'));
 
   const concepts = model.get('concepts');
   const terms = model.get('terms');
@@ -32,17 +32,17 @@ function render({ model, el }) {
 
   // Workspace
   const WW = 560, WH = 360;
-  const workspace = mk('div', 'faw-cm-workspace');
+  const workspace = mk('div', 'forma-cm-workspace');
 
   // SVG for drawing edges
-  const svg = mks('svg'); svg.classList.add('faw-cm-svg');
+  const svg = mks('svg'); svg.classList.add('forma-cm-svg');
   const defs = mks('defs');
   const mkMarker = (mid, color) => {
     const m = mks('marker', { id: mid, viewBox: '0 0 10 10', refX: '9', refY: '5', markerWidth: '6', markerHeight: '6', orient: 'auto' });
     const p = mks('path', { d: 'M0,0 L10,5 L0,10 z' }); p.style.fill = color; m.appendChild(p); return m;
   };
-  defs.appendChild(mkMarker(`cm-n-${id}`, 'var(--faw-neutral-color)'));
-  defs.appendChild(mkMarker(`cm-ok-${id}`, 'var(--faw-correct-color)'));
+  defs.appendChild(mkMarker(`cm-n-${id}`, 'var(--forma-neutral-color)'));
+  defs.appendChild(mkMarker(`cm-ok-${id}`, 'var(--forma-correct-color)'));
   defs.appendChild(mkMarker(`cm-err-${id}`, 'var(--destructive)'));
   svg.appendChild(defs);
   workspace.appendChild(svg);
@@ -56,7 +56,7 @@ function render({ model, el }) {
   // Create draggable concept nodes
   const nodeEls = {};
   concepts.forEach(name => {
-    const node = mk('div', 'faw-cm-node', name);
+    const node = mk('div', 'forma-cm-node', name);
     nodeEls[name] = node;
     node.style.left = positions[name].x + 'px';
     node.style.top  = positions[name].y + 'px';
@@ -88,34 +88,34 @@ function render({ model, el }) {
       e.stopPropagation();
       if (submitted || moved || !selectedTerm) return;
       if (!pendingFrom) {
-        pendingFrom = name; node.classList.add('faw-cm-pending');
+        pendingFrom = name; node.classList.add('forma-cm-pending');
       } else if (pendingFrom === name) {
-        nodeEls[pendingFrom].classList.remove('faw-cm-pending'); pendingFrom = null;
+        nodeEls[pendingFrom].classList.remove('forma-cm-pending'); pendingFrom = null;
       } else {
         const dup = edges.some(e => e.from === pendingFrom && e.to === name && e.label === selectedTerm);
         if (!dup) { edges.push({ from: pendingFrom, to: name, label: selectedTerm }); renderEdges(); renderEdgeList(); sync(); }
-        nodeEls[pendingFrom].classList.remove('faw-cm-pending'); pendingFrom = null;
+        nodeEls[pendingFrom].classList.remove('forma-cm-pending'); pendingFrom = null;
       }
     });
   });
 
   // Click on empty workspace to cancel pending
   workspace.addEventListener('click', () => {
-    if (pendingFrom && !submitted) { nodeEls[pendingFrom].classList.remove('faw-cm-pending'); pendingFrom = null; }
+    if (pendingFrom && !submitted) { nodeEls[pendingFrom].classList.remove('forma-cm-pending'); pendingFrom = null; }
   });
 
   container.appendChild(workspace);
 
   // Relationship term buttons
-  const termsRow = mk('div', 'faw-cm-terms');
+  const termsRow = mk('div', 'forma-cm-terms');
   const termBtns = {};
   terms.forEach(term => {
-    const btn = mk('button', 'faw-cm-term', term);
+    const btn = mk('button', 'forma-cm-term', term);
     btn.addEventListener('click', () => {
       if (submitted) return;
-      if (selectedTerm === term) { selectedTerm = null; btn.classList.remove('faw-cm-term-selected'); }
-      else { Object.values(termBtns).forEach(b => b.classList.remove('faw-cm-term-selected')); selectedTerm = term; btn.classList.add('faw-cm-term-selected'); }
-      if (pendingFrom) { nodeEls[pendingFrom].classList.remove('faw-cm-pending'); pendingFrom = null; }
+      if (selectedTerm === term) { selectedTerm = null; btn.classList.remove('forma-cm-term-selected'); }
+      else { Object.values(termBtns).forEach(b => b.classList.remove('forma-cm-term-selected')); selectedTerm = term; btn.classList.add('forma-cm-term-selected'); }
+      if (pendingFrom) { nodeEls[pendingFrom].classList.remove('forma-cm-pending'); pendingFrom = null; }
     });
     termBtns[term] = btn;
     termsRow.appendChild(btn);
@@ -123,22 +123,22 @@ function render({ model, el }) {
   container.appendChild(termsRow);
 
   // List of placed edges with remove buttons
-  const edgeList = mk('div', 'faw-cm-edge-list');
+  const edgeList = mk('div', 'forma-cm-edge-list');
   container.appendChild(edgeList);
 
   function renderEdgeList() {
     edgeList.innerHTML = '';
     edges.forEach((edge, i) => {
-      const row = mk('div', 'faw-cm-edge-row');
+      const row = mk('div', 'forma-cm-edge-row');
       row.appendChild(mk('span', null, edge.from + ' '));
-      row.appendChild(mk('span', 'faw-cm-edge-label', edge.label));
+      row.appendChild(mk('span', 'forma-cm-edge-label', edge.label));
       row.appendChild(mk('span', null, ' ' + edge.to));
       if (!submitted) {
-        const x = mk('button', 'faw-cm-edge-remove', '✕');
+        const x = mk('button', 'forma-cm-edge-remove', '✕');
         x.addEventListener('click', () => { edges.splice(i, 1); renderEdges(); renderEdgeList(); sync(); });
         row.appendChild(x);
       } else {
-        row.appendChild(mk('span', edge.correct ? 'faw-correct' : 'faw-incorrect', edge.correct ? ' ✓' : ' ✗'));
+        row.appendChild(mk('span', edge.correct ? 'forma-correct' : 'forma-incorrect', edge.correct ? ' ✓' : ' ✗'));
       }
       edgeList.appendChild(row);
     });
@@ -146,8 +146,8 @@ function render({ model, el }) {
 
   // Check / Clear buttons
   const btnRow = mk('div'); btnRow.style.marginTop = '12px';
-  const checkBtn = mk('button', 'faw-btn faw-btn-primary', 'Check Map'); checkBtn.style.marginRight = '12px';
-  const clearBtn = mk('button', 'faw-btn faw-btn-secondary', 'Clear All');
+  const checkBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Map'); checkBtn.style.marginRight = '12px';
+  const clearBtn = mk('button', 'forma-btn forma-btn-secondary', 'Clear All');
 
   checkBtn.addEventListener('click', () => {
     if (submitted || !edges.length) return;
@@ -158,7 +158,7 @@ function render({ model, el }) {
     edges.forEach(e => { e.correct = ce.some(c => c.from === e.from && c.to === e.to && c.label === e.label); if (e.correct) score++; });
     renderEdges(); renderEdgeList();
     const allRight = score === ce.length && edges.length === ce.length;
-    container.appendChild(mk('div', `faw-feedback ${allRight ? 'faw-correct' : 'faw-incorrect'}`, `${score}/${ce.length} correct connections`));
+    container.appendChild(mk('div', `forma-feedback ${allRight ? 'forma-correct' : 'forma-incorrect'}`, `${score}/${ce.length} correct connections`));
     model.set('value', { edges, score, total: ce.length, correct: allRight });
     model.save_changes();
   });
@@ -182,7 +182,7 @@ function render({ model, el }) {
       const x1 = fp.x + ux * rFrom, y1 = fp.y + uy * rFrom;
       const x2 = tp.x - ux * rTo,   y2 = tp.y - uy * rTo;
 
-      const color  = edge.correct === true ? 'var(--faw-correct-color)' : edge.correct === false ? 'var(--destructive)' : 'var(--faw-neutral-color)';
+      const color  = edge.correct === true ? 'var(--forma-correct-color)' : edge.correct === false ? 'var(--destructive)' : 'var(--forma-neutral-color)';
       const mId    = edge.correct === true ? `cm-ok-${id}` : edge.correct === false ? `cm-err-${id}` : `cm-n-${id}`;
 
       const line = mks('line', { x1, y1, x2, y2, 'stroke-width': 2 });
@@ -212,7 +212,7 @@ function render({ model, el }) {
   el.appendChild(container);
 }
 
-// Parse a <div class="marimo-concept-map"> block.
+// Parse a <div class="forma-concept-map"> block.
 // Question from the first <p>; a three-column table where each row is a correct edge:
 //   column 1 = source node, column 2 = relationship label, column 3 = target node.
 // concepts and terms are inferred as unique values in first-appearance order.

@@ -1,7 +1,7 @@
 {
   "name": "@gvwilson/forma",
-  "version": "0.1.0",
-  "description": "Standalone formative assessment widgets (multiple choice, flashcard, matching, ordering, labeling, concept map)",
+  "version": "0.3.0",
+  "description": "Standalone formative assessment widgets",
   "type": "module",
   "main": "./dist/forma.js",
   "exports": {
@@ -10,18 +10,22 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js --watch",
     "clean": "rm -rf dist",
-    "test": "npm run build && npx playwright test --config=playwright.config.js"
+    "serve": "node tests/server.js",
+    "test": "npm run build && npx playwright test --config=playwright.config.js",
+    "view": "npm info @gvwilson/forma"
   },
   "keywords": [
     "education",
     "widgets",
     "formative-assessment",
-    "AnyWidget",
-    "marimo"
+    "open-source"
   ],
   "author": "Greg Wilson",
   "license": "MIT",

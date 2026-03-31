@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Forma Examples</title>
+    <style>
+      body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+      h2 { margin-top: 2.5rem; border-bottom: 1px solid #ccc; padding-bottom: 0.25rem; }
+      /* Minimal CSS custom properties so widgets render without a full design system */
+      :root {
+        --primary: #4f46e5; --primary-foreground: #fff;
+        --secondary: #e5e7eb; --secondary-foreground: #111;
+        --accent: #ede9fe; --muted: #f3f4f6; --muted-foreground: #6b7280;
+        --background: #fff; --foreground: #111; --card: #fff;
+        --border: #d1d5db; --destructive: #dc2626;
+        --radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Forma Examples</h1>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Multiple Choice</h2>
+      <div class="forma-multiple-choice" data-lang="en">
+        <p>Which planet is closest to the Sun?</p>
+        <dl>
+          <dt>Venus</dt><dd>Wrong: Venus is the second planet from the Sun.</dd>
+          <dt>Mercury</dt><dd>Correct: Mercury is the first planet from the Sun.</dd>
+          <dt>Mars</dt><dd>Wrong: Mars is the fourth planet from the Sun.</dd>
+        </dl>
+      </div>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Flashcard</h2>
+      <div class="forma-flashcard" data-lang="en">
+        <p>Python built-in functions</p>
+        <dl>
+          <dt>len(x)</dt><dd>Returns the number of items in x.</dd>
+          <dt>type(x)</dt><dd>Returns the type of x.</dd>
+          <dt>range(n)</dt><dd>Returns an iterable of integers from 0 up to (but not including) n.</dd>
+          <dt>print(x)</dt><dd>Writes x to standard output.</dd>
+        </dl>
+      </div>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Ordering</h2>
+      <div class="forma-ordering" data-lang="en">
+        <p>Put these steps in the correct order to run a Python script:</p>
+        <ol>
+          <li>Write code in a .py file</li>
+          <li>Open a terminal</li>
+          <li>Navigate to the file's directory</li>
+          <li>Run <code>python script.py</code></li>
+          <li>Read the output</li>
+        </ol>
+      </div>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Matching</h2>
+      <div class="forma-matching" data-lang="en">
+        <p>Match each Python keyword to its purpose:</p>
+        <table>
+          <tr><td>def</td><td>Define a function</td></tr>
+          <tr><td>for</td><td>Iterate over a sequence</td></tr>
+          <tr><td>if</td><td>Branch on a condition</td></tr>
+          <tr><td>return</td><td>Send a value back from a function</td></tr>
+        </table>
+      </div>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Labeling</h2>
+      <div class="forma-labeling" data-lang="en">
+        <p>Label each line of this Python snippet:</p>
+        <table>
+          <tr><td>def greet(name):</td><td>Function definition</td></tr>
+          <tr><td>    message = "Hello, " + name</td><td>Variable assignment</td></tr>
+          <tr><td>    return message</td><td>Return statement</td></tr>
+          <tr><td>print(greet("world"))</td><td>Function call</td></tr>
+        </table>
+      </div>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Concept Map</h2>
+      <div class="forma-concept-map" data-lang="en">
+        <p>Draw the relationships between these data structure concepts:</p>
+        <table>
+          <tr><td>List</td><td>is a type of</td><td>Sequence</td></tr>
+          <tr><td>Tuple</td><td>is a type of</td><td>Sequence</td></tr>
+          <tr><td>Dictionary</td><td>maps keys to</td><td>Values</td></tr>
+        </table>
+      </div>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Numeric Entry</h2>
+      <div class="forma-numeric-entry" data-correct="42" data-tolerance="0.5" data-lang="en">
+        <p>A list has 6 rows and 7 columns. How many elements does it contain?</p>
+      </div>
+
+      <!-- ------------------------------------------------------------------ -->
+      <h2>Predict Then Check</h2>
+      <div class="forma-predict-then-check" data-lang="en">
+        <p>What does this code print?</p>
+        <pre>words = ["apple", "banana", "cherry"]
+print(len(words))</pre>
+        <dl>
+          <dt>2</dt><dd>Wrong: len() counts the items, not the last index.</dd>
+          <dt>3</dt><dd>Correct: the list has three items, so len() returns 3.</dd>
+          <dt>["apple", "banana", "cherry"]</dt><dd>Wrong: len() returns a count, not the list itself.</dd>
+        </dl>
+        <samp>3</samp>
+      </div>
+
+    </main>
+    <script type="module" src="../dist/forma.js"></script>
+  </body>
+</html>

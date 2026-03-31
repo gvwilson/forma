@@ -44,14 +44,14 @@ export function renderPredictThenCheck(el, config) {
 
 // Map each identifying CSS class to its [render, parseHTML] pair.
 const WIDGETS = {
-  'marimo-concept-map':       [conceptMap.render,      parseConceptMap],
-  'marimo-flashcard':         [flashcard.render,       parseFlashcard],
-  'marimo-labeling':          [labeling.render,        parseLabeling],
-  'marimo-matching':          [matching.render,        parseMatching],
-  'marimo-multiple-choice':   [multipleChoice.render,  parseMultipleChoice],
-  'marimo-numeric-entry':     [numericEntry.render,    parseNumericEntry],
-  'marimo-ordering':          [ordering.render,        parseOrdering],
-  'marimo-predict-then-check':[predictThenCheck.render,parsePredictThenCheck],
+  'forma-concept-map':       [conceptMap.render,      parseConceptMap],
+  'forma-flashcard':         [flashcard.render,       parseFlashcard],
+  'forma-labeling':          [labeling.render,        parseLabeling],
+  'forma-matching':          [matching.render,        parseMatching],
+  'forma-multiple-choice':   [multipleChoice.render,  parseMultipleChoice],
+  'forma-numeric-entry':     [numericEntry.render,    parseNumericEntry],
+  'forma-ordering':          [ordering.render,        parseOrdering],
+  'forma-predict-then-check':[predictThenCheck.render,parsePredictThenCheck],
 };
 
 // Find all widget divs under `root`, parse their HTML configuration, replace each
