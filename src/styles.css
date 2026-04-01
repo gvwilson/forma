@@ -1,6 +1,8 @@
 .forma {
   position: relative;
-  padding: 4px 0;
+  padding: 12px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+  border-radius: var(--radius);
   /* Semantic color tokens — override in dark mode below */
   --forma-correct-bg: #d4edda;
   --forma-correct-color: #28a745;
@@ -24,12 +26,12 @@
   --forma-neutral-color: #64748b;
 }
 
-.forma-question { font-size: 1.1em; font-weight: 600; margin-bottom: 12px; }
+.forma-question { font-size: 1.1em; margin-bottom: 12px; }
 .forma-instructions { font-size: 0.9em; color: var(--muted-foreground); margin-bottom: 12px; }
 
 .forma-btn {
   padding: 10px 20px; border: none; border-radius: var(--radius);
-  font: inherit; font-weight: 600; cursor: pointer;
+  font: inherit; cursor: pointer;
 }
 .forma-btn-primary { background: var(--primary); color: var(--primary-foreground); }
 .forma-btn-primary:hover:not(:disabled) { opacity: 0.9; }
@@ -39,7 +41,7 @@
 .forma-btn-danger:hover:not(:disabled) { opacity: 0.9; }
 .forma-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.forma-feedback { font-weight: 600; margin-top: 12px; }
+.forma-feedback { margin-top: 12px; }
 .forma-correct { color: var(--forma-correct-color); }
 .forma-incorrect { color: var(--destructive); }
 
@@ -69,7 +71,7 @@
 }
 .forma-item-fixed {
   padding: 10px; background: var(--accent); border: 2px solid var(--primary);
-  border-radius: var(--radius); font-weight: 500;
+  border-radius: var(--radius);
 }
 .forma-item-fixed.forma-correct { background: var(--forma-correct-bg); border-color: var(--forma-correct-color); }
 .forma-item-fixed.forma-incorrect { background: var(--forma-incorrect-bg); border-color: var(--destructive); }
@@ -79,13 +81,13 @@
   text-align: center; color: var(--muted-foreground); font-style: italic;
   cursor: pointer; transition: all .2s;
 }
-.forma-drop-zone.forma-filled { background: var(--secondary); border-style: solid; color: inherit; font-style: normal; font-weight: 500; }
+.forma-drop-zone.forma-filled { background: var(--secondary); border-style: solid; color: inherit; font-style: normal; }
 .forma-drop-zone.forma-drop-target, .forma-label-drop-zone.forma-drop-target { background: var(--forma-drop-bg); border-color: var(--forma-drop-border); }
 .forma-drop-zone.forma-correct { background: var(--forma-correct-bg); border-color: var(--forma-correct-color); }
 .forma-drop-zone.forma-incorrect { background: var(--forma-incorrect-bg); border-color: var(--destructive); }
 .forma-item-draggable {
   padding: 10px; background: var(--forma-draggable-bg); border: 2px solid var(--forma-draggable-border);
-  border-radius: var(--radius); font-weight: 500;
+  border-radius: var(--radius);
 }
 
 .forma-ordering-items { margin-bottom: 16px; }
@@ -106,19 +108,19 @@
 .forma-position, .forma-label-num {
   min-width: 30px; height: 30px; background: var(--primary); color: var(--primary-foreground);
   border-radius: 50%; display: flex; align-items: center;
-  justify-content: center; font-weight: 600; flex-shrink: 0;
+  justify-content: center; flex-shrink: 0;
 }
 .forma-label-badge {
   min-width: 24px; height: 24px; background: var(--primary); color: var(--primary-foreground);
   border-radius: 50%; display: flex; align-items: center;
-  justify-content: center; font-size: 0.8em; font-weight: 600; flex-shrink: 0;
+  justify-content: center; font-size: 0.8em; flex-shrink: 0;
 }
 .forma-label-badge.forma-correct { background: var(--forma-correct-color); color: white; }
 .forma-label-badge.forma-incorrect { background: var(--destructive); color: white; }
 
 .forma-labeling-area { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px; }
 .forma-labeling-labels, .forma-labeling-text { display: flex; flex-direction: column; gap: 10px; }
-.forma-labeling-title { font-weight: 600; color: var(--muted-foreground); margin-bottom: 6px; }
+.forma-labeling-title { color: var(--muted-foreground); margin-bottom: 6px; }
 .forma-label-item { display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: var(--radius); }
 .forma-text-lines { display: flex; flex-direction: column; gap: 8px; }
 .forma-text-line { display: flex; align-items: flex-start; gap: 8px; }
@@ -150,7 +152,7 @@
   position: absolute; transform: translate(-50%, -50%);
   padding: 8px 14px; background: var(--card); border: 2px solid var(--primary);
   border-radius: var(--radius); cursor: move; user-select: none;
-  font-weight: 500; z-index: 1; white-space: nowrap;
+  z-index: 1; white-space: nowrap;
 }
 .forma-cm-node.forma-cm-pending { box-shadow: 0 0 0 3px var(--primary); background: var(--accent); }
 .forma-cm-terms { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -166,7 +168,7 @@
   display: flex; align-items: center; gap: 6px;
   padding: 4px 8px; background: var(--muted); border-radius: var(--radius); font-size: 0.9em;
 }
-.forma-cm-edge-label { padding: 2px 8px; background: var(--accent); border-radius: 10px; font-size: 0.85em; font-weight: 500; }
+.forma-cm-edge-label { padding: 2px 8px; background: var(--accent); border-radius: 10px; font-size: 0.85em; }
 .forma-cm-edge-remove { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--muted-foreground); padding: 2px 4px; border-radius: 4px; }
 .forma-cm-edge-remove:hover { color: var(--destructive); background: var(--forma-incorrect-bg); }
 
@@ -199,7 +201,7 @@
   border: 1.5px solid var(--border);
   background: var(--muted);
   color: var(--muted-foreground);
-  font: 600 0.8em/1 inherit;
+  font: 0.8em/1 inherit;
   cursor: pointer;
   display: flex;
   align-items: center;

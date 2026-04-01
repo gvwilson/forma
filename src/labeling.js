@@ -3,9 +3,9 @@ import { addHelpButton } from './help.js';
 import { mk } from './utils.js';
 
 const HELP_TEXT = {
-  en: 'Drag the numbered labels from the left panel and drop them onto the correct text lines on the right. You can remove a placed label by dragging it outside the text area. Click Check Labels when done.',
-  fr: 'Faites glisser les étiquettes numérotées du panneau gauche et déposez-les sur les lignes de texte correctes à droite. Supprimez une étiquette en la faisant glisser hors de la zone de texte. Cliquez sur Vérifier les étiquettes quand vous avez terminé.',
-  es: 'Arrastre las etiquetas numeradas del panel izquierdo y suéltelas en las líneas de texto correctas de la derecha. Elimine una etiqueta arrastrándola fuera del área de texto. Haga clic en Verificar etiquetas cuando termine.',
+  en: 'Drag the numbered labels from the left panel and drop them onto the correct text lines on the right. You can remove a placed label by dragging it outside the text area. Click Check Labels when done. Click Try Again to reset and retry.',
+  fr: 'Faites glisser les étiquettes numérotées du panneau gauche et déposez-les sur les lignes de texte correctes à droite. Supprimez une étiquette en la faisant glisser hors de la zone de texte. Cliquez sur Vérifier les étiquettes quand vous avez terminé. Cliquez sur Réessayer pour recommencer.',
+  es: 'Arrastre las etiquetas numeradas del panel izquierdo y suéltelas en las líneas de texto correctas de la derecha. Elimine una etiqueta arrastrándola fuera del área de texto. Haga clic en Verificar etiquetas cuando termine. Haga clic en Reintentar para volver a intentarlo.',
 };
 
 function render({ model, el }) {
@@ -81,7 +81,10 @@ function render({ model, el }) {
   area.append(labelsCol, textCol);
   container.appendChild(area);
 
-  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Labels'); submitBtn.style.marginTop = '16px';
+  const btnRow = mk('div'); btnRow.style.marginTop = '16px';
+  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Labels'); submitBtn.style.marginRight = '12px';
+  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again'); tryAgainBtn.style.display = 'none';
+
   submitBtn.addEventListener('click', () => {
     if (submitted) return;
     submitted = true; submitBtn.disabled = true;
@@ -97,11 +100,27 @@ function render({ model, el }) {
     });
     const pct = total ? Math.round(score / total * 100) : 0;
     container.appendChild(mk('div', `forma-feedback ${score === total ? 'forma-correct' : 'forma-incorrect'}`, `Score: ${score}/${total} correct (${pct}%)`));
+    tryAgainBtn.style.display = 'inline-block';
     model.set('value', { placed_labels: placed, score, total, correct: score === total });
     model.save_changes();
   });
 
-  container.appendChild(submitBtn);
+  tryAgainBtn.addEventListener('click', () => {
+    submitted = false;
+    submitBtn.disabled = false;
+    tryAgainBtn.style.display = 'none';
+    labelsCol.querySelectorAll('.forma-label-num').forEach(n => { n.draggable = true; n.style.cursor = ''; });
+    Object.keys(placed).forEach(k => delete placed[k]);
+    linesEl.querySelectorAll('.forma-text-line').forEach((line, lineIdx) => {
+      renderBadges(line.querySelector('.forma-label-drop-zone'), lineIdx);
+    });
+    const fb = container.querySelector('.forma-feedback');
+    if (fb) fb.remove();
+    sync();
+  });
+
+  btnRow.append(submitBtn, tryAgainBtn);
+  container.appendChild(btnRow);
   addHelpButton(container, model.get('lang'), HELP_TEXT);
   el.appendChild(container);
 
@@ -114,7 +133,11 @@ function render({ model, el }) {
 // The labels list is derived as unique names in first-appearance order.
 export function parseHTML(div) {
   const question = div.querySelector('p')?.textContent.trim() ?? '';
-  const rows     = [...div.querySelectorAll('tr')];
+  // Skip header rows (from <thead> or containing <th> cells) so that
+  // Markdown-generated tables with a required header row parse correctly.
+  const rows = [...div.querySelectorAll('tr')].filter(
+    r => r.closest('thead') === null && r.querySelector('th') === null
+  );
   const labelNames = [];
   rows.forEach(r => {
     r.cells[1].textContent.split(',').map(s => s.trim()).forEach(name => {

@@ -3,9 +3,9 @@ import { addHelpButton } from './help.js';
 import { mk } from './utils.js';
 
 const HELP_TEXT = {
-  en: 'Read the code, predict what it will output, then select your answer. Use the Reveal Output button to confirm by running it yourself.',
-  fr: 'Lisez le code, prédisez ce qu\'il affichera, puis sélectionnez votre réponse. Utilisez le bouton Révéler pour confirmer en l\'exécutant vous-même.',
-  es: 'Lea el código, prediga lo que mostrará, luego seleccione su respuesta. Use el botón Revelar para confirmar ejecutándolo usted mismo.',
+  en: 'Read the code, predict what it will output, then select your answer. Use the Reveal Output button to confirm by running it yourself. Click Try Again to reset and retry.',
+  fr: 'Lisez le code, prédisez ce qu\'il affichera, puis sélectionnez votre réponse. Utilisez le bouton Révéler pour confirmer. Cliquez sur Réessayer pour recommencer.',
+  es: 'Lea el código, prediga lo que mostrará, luego seleccione su respuesta. Use el botón Revelar para confirmar. Haga clic en Reintentar para volver a intentarlo.',
 };
 
 function render({ model, el }) {
@@ -31,6 +31,23 @@ function render({ model, el }) {
 
   const feedbackEl = mk('div'); feedbackEl.style.display = 'none';
   const explanationEl = mk('div'); explanationEl.style.display = 'none';
+  let revealBtn = null, outputEl = null;
+  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again');
+  tryAgainBtn.style.display = 'none';
+  tryAgainBtn.addEventListener('click', () => {
+    answered = false;
+    [...opts.children].forEach(opt => {
+      opt.classList.remove('forma-answered', 'forma-correct', 'forma-incorrect', 'forma-faded');
+      opt.querySelector('input').checked = false;
+    });
+    feedbackEl.style.display = 'none';
+    explanationEl.style.display = 'none';
+    tryAgainBtn.style.display = 'none';
+    if (revealBtn) { revealBtn.disabled = false; }
+    if (outputEl) { outputEl.style.display = 'none'; }
+    model.set('value', { selected: null, correct: false, answered: false });
+    model.save_changes();
+  });
 
   options.forEach((text, i) => {
     const div = mk('div', 'forma-option');
@@ -51,6 +68,7 @@ function render({ model, el }) {
       feedbackEl.style.display = 'block';
       const expl = explanations[i] || model.get('explanation');
       if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
+      tryAgainBtn.style.display = 'inline-block';
       model.set('value', { selected: i, correct: ok, answered: true });
       model.save_changes();
     };
@@ -60,13 +78,13 @@ function render({ model, el }) {
     opts.appendChild(div);
   });
 
-  container.append(opts, feedbackEl, explanationEl);
+  container.append(opts, feedbackEl, explanationEl, tryAgainBtn);
 
   // Reveal button lets the learner verify by seeing/running the actual output
   const output = model.get('output');
   if (output !== undefined && output !== null && output !== '') {
-    const revealBtn = mk('button', 'forma-btn forma-btn-secondary forma-reveal-btn', 'Reveal Output');
-    const outputEl = mk('pre', 'forma-output');
+    revealBtn = mk('button', 'forma-btn forma-btn-secondary forma-reveal-btn', 'Reveal Output');
+    outputEl = mk('pre', 'forma-output');
     outputEl.style.display = 'none';
     outputEl.textContent = output;
 

@@ -3,9 +3,9 @@ import { addHelpButton } from './help.js';
 import { mk, shuffle } from './utils.js';
 
 const HELP_TEXT = {
-  en: 'Drag the items up or down to arrange them in the correct order. Click Check Order to submit your answer, or Reset to shuffle and start over.',
-  fr: 'Faites glisser les éléments vers le haut ou le bas pour les mettre dans le bon ordre. Cliquez sur Vérifier l\'ordre pour soumettre, ou Réinitialiser pour recommencer.',
-  es: 'Arrastre los elementos hacia arriba o abajo para ordenarlos correctamente. Haga clic en Verificar orden para enviar su respuesta, o Restablecer para comenzar de nuevo.',
+  en: 'Drag the items up or down to arrange them in the correct order. Click Check Order to submit your answer, Reset to shuffle and start over, or Try Again after submitting.',
+  fr: 'Faites glisser les éléments vers le haut ou le bas pour les mettre dans le bon ordre. Cliquez sur Vérifier l\'ordre pour soumettre, Réinitialiser pour recommencer, ou Réessayer après soumission.',
+  es: 'Arrastre los elementos hacia arriba o abajo para ordenarlos correctamente. Haga clic en Verificar orden para enviar, Restablecer para mezclar de nuevo, o Reintentar después de enviar.',
 };
 
 function render({ model, el }) {
@@ -46,7 +46,8 @@ function render({ model, el }) {
 
   const btnRow = mk('div'); btnRow.style.marginBottom = '16px';
   const checkBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Order'); checkBtn.style.marginRight = '12px';
-  const resetBtn = mk('button', 'forma-btn forma-btn-secondary', 'Reset');
+  const resetBtn = mk('button', 'forma-btn forma-btn-secondary', 'Reset'); resetBtn.style.marginRight = '12px';
+  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again'); tryAgainBtn.style.display = 'none';
 
   checkBtn.addEventListener('click', () => {
     if (submitted) return;
@@ -59,6 +60,7 @@ function render({ model, el }) {
     feedbackEl.textContent = ok ? '✓ Correct order!' : '✗ Incorrect order';
     feedbackEl.className = `forma-feedback ${ok ? 'forma-correct' : 'forma-incorrect'}`;
     feedbackEl.style.display = 'block';
+    tryAgainBtn.style.display = 'inline-block';
     model.set('value', { order: current, correct: ok }); model.save_changes();
   });
 
@@ -69,7 +71,19 @@ function render({ model, el }) {
     renderItems(); feedbackEl.style.display = 'none'; sync();
   });
 
-  btnRow.append(checkBtn, resetBtn);
+  tryAgainBtn.addEventListener('click', () => {
+    submitted = false;
+    checkBtn.disabled = false;
+    tryAgainBtn.style.display = 'none';
+    resetBtn.style.display = 'inline-block';
+    current = [...correct];
+    if (model.get('shuffle')) shuffle(current);
+    renderItems();
+    feedbackEl.style.display = 'none';
+    sync();
+  });
+
+  btnRow.append(checkBtn, resetBtn, tryAgainBtn);
   container.append(itemsEl, btnRow, feedbackEl);
   addHelpButton(container, model.get('lang'), HELP_TEXT);
   el.appendChild(container);

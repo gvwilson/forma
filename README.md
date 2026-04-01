@@ -1,7 +1,7 @@
 # forma
 
-**Forma** (short for *formative assessment*) is a standalone JavaScript package
-providing eight interactive assessment widgets:
+Forma (short for *formative assessment*) is a standalone JavaScript
+package providing eight interactive assessment widgets:
 
 | Widget | Description |
 |---|---|
@@ -23,7 +23,7 @@ npm install forma
 Or load directly in HTML without a build step:
 
 ```html
-<script type="module" src="https://unpkg.com/forma/dist/forma.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@gvwilson/forma" type="module"></script>
 ```
 
 ## Usage
@@ -57,7 +57,7 @@ properties described below.
 
 When the bundle is loaded, it scans the page for `div.forma-*` elements and
 mounts the corresponding widget, replacing the markup. This lets you author
-exercises in plain HTML or Markdown:
+exercises in plain HTML or Markdown.
 
 ```html
 <div class="forma-multiple-choice" data-lang="en">
@@ -79,11 +79,16 @@ import { autoMount } from 'forma';
 autoMount(document.getElementById('exercises'));
 ```
 
-## Widget configuration
+## Widget Configuration
 
-### Multiple choice
+### Multiple Choice
 
-**JavaScript**:
+For HTML and Markdown configuration, the `<dd>` whose text starts with
+the word "Correct" (case-insensitive) identifies the correct option.
+All other `<dd>` elements are shown for incorrect options.
+
+#### JavaScript
+
 ```js
 renderMultipleChoice(el, {
   question: 'string',
@@ -99,7 +104,8 @@ renderMultipleChoice(el, {
 });
 ```
 
-**HTML** — preferred `<dl>` format (per-option explanations):
+#### HTML
+
 ```html
 <div class="forma-multiple-choice" data-lang="en">
   <p>Question text</p>
@@ -111,13 +117,31 @@ renderMultipleChoice(el, {
 </div>
 ```
 
-The `<dd>` whose text starts with the word **Correct** (case-insensitive)
-identifies the correct option; all other `<dd>` elements are shown for
-incorrect options.
+#### Markdown
+
+```html
+<div class="forma-multiple-choice" data-lang="en" markdown="1">
+
+Question text
+
+Option A
+:   Wrong: reason A is incorrect.
+
+Option B
+:   Correct: reason B is right.
+
+Option C:
+:   Wrong: reason C is incorrect.
+
+</div>
+```
 
 ### Flashcard
 
-**JavaScript**:
+Cards are shuffled automatically.
+
+#### JavaScript
+
 ```js
 renderFlashcard(el, {
   question: 'Deck title',
@@ -127,10 +151,11 @@ renderFlashcard(el, {
 });
 ```
 
-**HTML**:
+#### HTML
+
 ```html
 <div class="forma-flashcard" data-lang="en">
-  <p>Deck title (optional)</p>
+  <p>Deck title</p>
   <dl>
     <dt>Front of card 1</dt><dd>Back of card 1</dd>
     <dt>Front of card 2</dt><dd>Back of card 2</dd>
@@ -138,11 +163,29 @@ renderFlashcard(el, {
 </div>
 ```
 
-Cards are shuffled automatically.
+#### Markdown
+
+```html
+<div class="forma-flashcard" data-lang="en" markdown="1">
+
+Deck title
+
+Front of card 1
+:   Back of card 1
+
+Front of card 2
+:   Back of card 2
+
+</div>
+```
 
 ### Ordering
 
-**JavaScript**:
+For HTML and Markdown configuration, the `<ol>` lists items in the
+correct order. Items are shuffled automatically before display.
+
+#### JavaScript
+
 ```js
 renderOrdering(el, {
   question: 'string',
@@ -153,7 +196,8 @@ renderOrdering(el, {
 });
 ```
 
-**HTML**:
+#### HTML
+
 ```html
 <div class="forma-ordering" data-lang="en">
   <p>Question text</p>
@@ -165,12 +209,29 @@ renderOrdering(el, {
 </div>
 ```
 
-The `<ol>` lists items in the **correct** order. Items are shuffled
-automatically before display.
+#### Markdown
+
+```html
+<div class="forma-ordering" data-lang="en" markdown="1">
+
+Question text
+
+1.  First step (correct position)
+1.  Second step
+1.  Third step
+
+</div>
+```
 
 ### Matching
 
-**JavaScript**:
+For HTML and Markdown configuration, each row in the table defines a
+matched pair. The right column is shuffled automatically.  If a header
+row is present, it is ignored (so that tables generated from Markdown
+can be handled).
+
+#### JavaScript
+
 ```js
 renderMatching(el, {
   question: 'string',
@@ -181,7 +242,8 @@ renderMatching(el, {
 });
 ```
 
-**HTML**:
+#### HTML
+
 ```html
 <div class="forma-matching" data-lang="en">
   <p>Question text</p>
@@ -192,11 +254,32 @@ renderMatching(el, {
 </div>
 ```
 
-Each row defines a matched pair. The right column is shuffled automatically.
+#### Markdown
+
+```html
+<div class="forma-matching" data-lang="en" markdown="1">
+
+Question text
+
+| Item | Label |
+| ---- | ----- |
+| Left item 1 | Right item 1 |
+| Left item 2 | Right item 2 |
+
+</div>
+```
 
 ### Labeling
 
-**JavaScript**:
+For HTML and Markdown configuration, column 1 is the text to label,
+and column 2 is the correct label name (or comma-separated list for
+lines that accept multiple labels). The available label set is derived
+automatically from unique names in column 2.  If a header row is
+present, it is ignored (so that tables generated from Markdown can be
+handled).
+
+#### JavaScript
+
 ```js
 renderLabeling(el, {
   question: 'string',
@@ -210,24 +293,42 @@ renderLabeling(el, {
 });
 ```
 
-**HTML**:
+#### HTML
+
 ```html
 <div class="forma-labeling" data-lang="en">
   <p>Question text</p>
   <table>
-    <tr><td>Text line 1</td><td>Label name</td></tr>
-    <tr><td>Text line 2</td><td>Label A, Label B</td></tr>
+| Text line 1 | Label name |
+| Text line 2 | Label A, Label B |
   </table>
 </div>
 ```
 
-Column 1 is the text to label; column 2 is the correct label name (or
-comma-separated list for lines that accept multiple labels). The available label
-set is derived automatically from unique names in column 2.
+#### Markdown
+
+```html
+<div class="forma-labeling" data-lang="en" markdown="1">
+
+Question text
+
+| Text | Label |
+| ---- | ----- |
+| Text line 1 | Label name |
+| Text line 2 | Label A, Label B |
+
+</div>
+```
 
 ### Concept map
 
-**JavaScript**:
+For HTML and Markdown configuration, each row defines one correct
+directed edge. The node list and term list are inferred automatically
+from the table in first-appearance order.  If a header row is present,
+it is ignored (so that tables generated from Markdown can be handled).
+
+#### JavaScript
+
 ```js
 renderConceptMap(el, {
   question: 'string',
@@ -240,23 +341,44 @@ renderConceptMap(el, {
 });
 ```
 
-**HTML**:
+#### HTML
+
 ```html
 <div class="forma-concept-map" data-lang="en">
   <p>Question text</p>
   <table>
-    <tr><td>Source node</td><td>relationship</td><td>Target node</td></tr>
-    <tr><td>Node A</td>    <td>leads to</td>    <td>Node B</td></tr>
+| Source node | relationship | Target node |
+| Node A</td>    <td>leads to</td>    <td>Node B |
   </table>
 </div>
 ```
 
-Each row defines one correct directed edge. The node list and term list are
-inferred automatically from the table in first-appearance order.
+#### Markdown
+
+```html
+<div class="forma-concept-map" data-lang="en" markdown="1">
+
+Question text
+
+| From | Link | To |
+| ---- | ---- | -- |
+| Source node | relationship | Target node |
+| Node A | leads to | Node B |
+
+</div>
+```
 
 ### Numeric entry
 
-**JavaScript**:
+The answer is accepted as correct when
+`|entered − correct_answer| < tolerance`.
+The default tolerance is `1e-9`, suitable for exact integer answers.
+For HTML and Markdown configuration, `data-correct` is the expected
+numeric answer and `data-tolerance` is the acceptance window.
+The learner can press Enter or click Submit to check their answer.
+
+#### JavaScript
+
 ```js
 renderNumericEntry(el, {
   question: 'string',
@@ -267,23 +389,37 @@ renderNumericEntry(el, {
 });
 ```
 
-The answer is accepted as correct when `|entered − correct_answer| < tolerance`.
-The default tolerance is `1e-9`, suitable for exact integer answers.
+#### HTML
 
-**HTML**:
 ```html
 <div class="forma-numeric-entry" data-correct="42" data-tolerance="0.01" data-lang="en">
   <p>Question text</p>
 </div>
 ```
 
-`data-correct` is the expected numeric answer and `data-tolerance` is the
-acceptance window (defaults to `1e-9` if omitted). The learner can press
-**Enter** or click **Submit** to check their answer.
+#### Markdown
 
-### Predict-then-check
+```html
+<div class="forma-numeric-entry" data-correct="42" data-tolerance="0.01" data-lang="en" markdown="1">
 
-**JavaScript**:
+Question text
+
+</div>
+```
+
+### Predict-Then-Check
+
+The learner reads the code, selects their predicted output, and
+receives immediate feedback with a per-option explanation. A Reveal
+Output button (disabled after clicking) shows the actual output so the
+learner can verify by running the code themselves.
+
+For HTML and Markdown configuration, `<pre>` holds the code; `<samp>`
+holds the actual output. Options and explanations come from `<dl>`
+(same `<dd>` "Correct" prefix convention as MultipleChoice).
+
+#### JavaScript
+
 ```js
 renderPredictThenCheck(el, {
   question: 'string',
@@ -301,12 +437,8 @@ renderPredictThenCheck(el, {
 });
 ```
 
-The learner reads the code, selects their predicted output, and receives
-immediate feedback with a per-option explanation. A **Reveal Output** button
-(disabled after clicking) shows the actual output so the learner can verify
-by running the code themselves.
+#### HTML
 
-**HTML** — `<dl>` format with per-option explanations:
 ```html
 <div class="forma-predict-then-check" data-lang="en">
   <p>Question text</p>
@@ -321,20 +453,44 @@ print(x)</pre>
 </div>
 ```
 
-`<pre>` holds the code; `<samp>` holds the actual output. Options and
-explanations come from `<dl>` (same `<dd>` "Correct" prefix convention as
-MultipleChoice). A legacy `<ol>` with `data-correct` is also accepted when
-per-option explanations are not needed.
+#### Markdown
+
+```html
+<div class="forma-predict-then-check" data-lang="en" markdown="1">
+
+Question text
+
+```
+x = 2 + 2
+print(x)
+```
+
+2
+:   Wrong: + is addition here, not string concatenation.
+
+4
+:   Correct: 2 + 2 = 4.
+
+22
+:   Wrong: that would require string concatenation.
+
+<samp>4</samp>
+</div>
+```
 
 ## Development
 
 ```sh
+npx playwright install chromium   # one-time browser install
 npm install          # install esbuild and Playwright
 npm run build        # build dist/forma.js and dist/widgets/
 npm test             # build then run all Playwright tests
-npx playwright install chromium   # one-time browser install
+npm run serve        # and then go to http://localhost:7700/examples/index.html
 ```
 
-## License
+-   During development, it is sometimes useful to visit
+    <https://www.jsdelivr.com/tools/purge> to clear the CDN's cache so
+    that pages load the most recently uploaded version of the package.
 
-MIT
+-   Use `uv run bin/md2html.py examples/markdown.md examples/markdown.html`
+    to regenerate the HTML version of the Markdown examples.

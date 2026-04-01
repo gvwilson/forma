@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<p><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Forma Examples using HTML</title>
+<link href="./examples.css" rel="stylesheet" type="text/css"/>
+</head></p>
+<body>
+<h1>Forma Examples using Markdown</h1>
+<h2>Multiple Choice</h2>
+<div class="forma-multiple-choice" data-lang="en">
+<p>Which planet is closest to the Sun?</p>
+<dl>
+<dt>Venus</dt>
+<dd>Wrong: Venus is the second planet from the Sun.</dd>
+<dt>Mercury</dt>
+<dd>Correct: Mercury is the first planet from the Sun.</dd>
+<dt>Mars</dt>
+<dd>Wrong: Mars is the fourth planet from the Sun.</dd>
+</dl>
+</div>
+<h2>Flashcard</h2>
+<div class="forma-flashcard" data-lang="en">
+<p>Python built-in functions</p>
+<dl>
+<dt>len(x)</dt>
+<dd>Returns the number of items in x.</dd>
+<dt>type(x)</dt>
+<dd>
+<dl>
+<dt>Returns the type of x.</dt>
+<dt>range(n)</dt>
+<dd>Returns an iterable of integers from 0 up to (but not including) n.</dd>
+</dl>
+</dd>
+<dt>print(x)</dt>
+<dd>Writes x to standard output.</dd>
+</dl>
+</div>
+<h2>Ordering</h2>
+<div class="forma-ordering" data-lang="en">
+<p>Put these steps in the correct order to run a Python script:</p>
+<ol>
+<li>Write code in a .py file</li>
+<li>Open a terminal</li>
+<li>Navigate to the file's directory</li>
+<li>Run <code>python script.py</code></li>
+<li>Read the output</li>
+</ol>
+</div>
+<h2>Matching</h2>
+<div class="forma-matching" data-lang="en">
+<p>Match each Python keyword to its purpose:</p>
+<table>
+<thead>
+<tr>
+<th>Keyword</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>def</code></td>
+<td>Define a function</td>
+</tr>
+<tr>
+<td><code>for</code></td>
+<td>Iterate over a sequence</td>
+</tr>
+<tr>
+<td><code>if</code></td>
+<td>Branch on a condition</td>
+</tr>
+<tr>
+<td><code>return</code></td>
+<td>Send a value back from a function</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Labeling</h2>
+<div class="forma-labeling" data-lang="en">
+<p>Label each line of this Python snippet:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>def greet(name):</code></td>
+<td>Function definition</td>
+</tr>
+<tr>
+<td><code>message = "Hello, " + name</code></td>
+<td>Variable assignment</td>
+</tr>
+<tr>
+<td><code>return message</code></td>
+<td>Return statement</td>
+</tr>
+<tr>
+<td><code>print(greet("world"))</code></td>
+<td>Function call</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Concept Map</h2>
+<div class="forma-concept-map" data-lang="en">
+<p>Draw the relationships between these data structure concepts:</p>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>Link</th>
+<th>To</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>List</td>
+<td>is a type of</td>
+<td>Sequence</td>
+</tr>
+<tr>
+<td>Tuple</td>
+<td>is a type of</td>
+<td>Sequence</td>
+</tr>
+<tr>
+<td>Dictionary</td>
+<td>maps keys to</td>
+<td>Values</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2>Numeric Entry</h2>
+<div class="forma-numeric-entry" data-correct="42" data-lang="en" data-tolerance="0.5">
+<p>A list has 6 rows and 7 columns. How many elements does it contain?</p>
+</div>
+<h2>Predict Then Check</h2>
+<div class="forma-predict-then-check" data-lang="en">
+<p>What does this code print?</p>
+<pre class="codehilite"><code>words = [&quot;apple&quot;, &quot;banana&quot;, &quot;cherry&quot;]
+print(len(words))
+</code></pre>
+
+<dl>
+<dt><code>2</code></dt>
+<dd>Wrong: len() counts the items, not the last index.</dd>
+<dt><code>3</code></dt>
+<dd>Correct: the list has three items, so len() returns 3.</dd>
+<dt><code>["apple", "banana", "cherry"]</code></dt>
+<dd>Wrong: len() returns a count, not the list itself.</dd>
+</dl>
+<p><samp>3</samp></p>
+</div>
+<script src="../dist/forma.js" type="module"></script>
+</body>
+</html>

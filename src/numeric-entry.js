@@ -3,9 +3,9 @@ import { addHelpButton } from './help.js';
 import { mk } from './utils.js';
 
 const HELP_TEXT = {
-  en: 'Type a number and click Submit to check your answer.',
-  fr: 'Saisissez un nombre et cliquez sur Soumettre pour vérifier votre réponse.',
-  es: 'Escriba un número y haga clic en Enviar para verificar su respuesta.',
+  en: 'Type a number and click Submit to check your answer. Click Try Again to reset and retry.',
+  fr: 'Saisissez un nombre et cliquez sur Soumettre pour vérifier votre réponse. Cliquez sur Réessayer pour recommencer.',
+  es: 'Escriba un número y haga clic en Enviar para verificar su respuesta. Haga clic en Reintentar para volver a intentarlo.',
 };
 
 // Default tolerance used when none is specified; treats two floats as equal
@@ -23,6 +23,8 @@ function render({ model, el }) {
   input.placeholder = '…';
 
   const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Submit');
+  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again');
+  tryAgainBtn.style.cssText = 'display:none;margin-left:12px';
   const feedbackEl = mk('div'); feedbackEl.style.display = 'none';
   const explanationEl = mk('div'); explanationEl.style.display = 'none';
 
@@ -46,15 +48,28 @@ function render({ model, el }) {
     const expl = model.get('explanation');
     if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
 
+    tryAgainBtn.style.display = 'inline-block';
     model.set('value', { entered, correct, ok, answered: true });
     model.save_changes();
   };
+
+  tryAgainBtn.addEventListener('click', () => {
+    answered = false;
+    input.disabled = false;
+    input.value = '';
+    submitBtn.disabled = false;
+    feedbackEl.style.display = 'none';
+    explanationEl.style.display = 'none';
+    tryAgainBtn.style.display = 'none';
+    model.set('value', { entered: null, correct: null, ok: false, answered: false });
+    model.save_changes();
+  });
 
   submitBtn.addEventListener('click', submit);
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
 
   const row = mk('div', 'forma-numeric-row');
-  row.append(input, submitBtn);
+  row.append(input, submitBtn, tryAgainBtn);
   container.append(row, feedbackEl, explanationEl);
   addHelpButton(container, model.get('lang'), HELP_TEXT);
   el.appendChild(container);

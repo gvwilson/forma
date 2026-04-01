@@ -1,7 +1,7 @@
 {
   "name": "@gvwilson/forma",
-  "version": "0.3.0",
-  "description": "Standalone formative assessment widgets",
+  "version": "0.7.0",
+  "description": "Formative assessment widgets",
   "type": "module",
   "main": "./dist/forma.js",
   "exports": {

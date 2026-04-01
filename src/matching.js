@@ -3,9 +3,9 @@ import { addHelpButton } from './help.js';
 import { mk, shuffle } from './utils.js';
 
 const HELP_TEXT = {
-  en: 'Drag items from the right column and drop them into the matching slots in the middle column. Click a placed item to remove it and try again. All items must be matched before you can check your answers.',
-  fr: 'Faites glisser les éléments de la colonne droite et déposez-les dans les emplacements correspondants de la colonne centrale. Cliquez sur un élément placé pour le retirer. Tous les éléments doivent être appariés avant de vérifier.',
-  es: 'Arrastre los elementos de la columna derecha y suéltelos en las ranuras correspondientes de la columna central. Haga clic en un elemento colocado para eliminarlo. Todos los elementos deben estar emparejados antes de verificar.',
+  en: 'Drag items from the right column and drop them into the matching slots in the middle column. Click a placed item to remove it and try again. All items must be matched before you can check your answers. Click Try Again to reset and retry.',
+  fr: 'Faites glisser les éléments de la colonne droite et déposez-les dans les emplacements correspondants de la colonne centrale. Cliquez sur un élément placé pour le retirer. Tous les éléments doivent être appariés avant de vérifier. Cliquez sur Réessayer pour recommencer.',
+  es: 'Arrastre los elementos de la columna derecha y suéltelos en las ranuras correspondientes de la columna central. Haga clic en un elemento colocado para eliminarlo. Todos los elementos deben estar emparejados antes de verificar. Haga clic en Reintentar para volver a intentarlo.',
 };
 
 function render({ model, el }) {
@@ -54,7 +54,10 @@ function render({ model, el }) {
   left.forEach((_, i) => grid.append(leftItems[i], zones[i], rightItems[i]));
   container.appendChild(grid);
 
-  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Answers'); submitBtn.style.marginBottom = '16px';
+  const btnRow = mk('div'); btnRow.style.marginBottom = '16px';
+  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Answers'); submitBtn.style.marginRight = '12px';
+  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again'); tryAgainBtn.style.display = 'none';
+
   submitBtn.addEventListener('click', () => {
     if (submitted) return;
     if (Object.keys(matches).length !== left.length) { alert('Please match all items before checking answers.'); return; }
@@ -69,11 +72,26 @@ function render({ model, el }) {
       z.appendChild(mk('span', ok ? 'forma-correct' : 'forma-incorrect', ok ? ' ✓' : ' ✗'));
     });
     container.appendChild(mk('div', `forma-feedback ${score === left.length ? 'forma-correct' : 'forma-incorrect'}`, `Score: ${score}/${left.length} correct`));
+    tryAgainBtn.style.display = 'inline-block';
     model.set('value', { matches, correct: score === left.length, score, total: left.length });
     model.save_changes();
   });
 
-  container.appendChild(submitBtn);
+  tryAgainBtn.addEventListener('click', () => {
+    submitted = false;
+    submitBtn.disabled = false;
+    tryAgainBtn.style.display = 'none';
+    Object.keys(matches).forEach(k => delete matches[k]);
+    zones.forEach(z => { z.textContent = '(drop here)'; z.className = 'forma-drop-zone'; });
+    leftItems.forEach(li => li.classList.remove('forma-correct', 'forma-incorrect'));
+    rightItems.forEach(d => { d.draggable = true; d.style.cssText = ''; });
+    const fb = container.querySelector('.forma-feedback');
+    if (fb) fb.remove();
+    sync();
+  });
+
+  btnRow.append(submitBtn, tryAgainBtn);
+  container.appendChild(btnRow);
   addHelpButton(container, model.get('lang'), HELP_TEXT);
   el.appendChild(container);
 
@@ -85,7 +103,11 @@ function render({ model, el }) {
 // The right column is shuffled; correct_matches is updated to reflect the new order.
 export function parseHTML(div) {
   const question = div.querySelector('p')?.textContent.trim() ?? '';
-  const rows = [...div.querySelectorAll('tr')];
+  // Skip header rows (from <thead> or containing <th> cells) so that
+  // Markdown-generated tables with a required header row parse correctly.
+  const rows = [...div.querySelectorAll('tr')].filter(
+    r => r.closest('thead') === null && r.querySelector('th') === null
+  );
   const left         = rows.map(r => r.cells[0].textContent.trim());
   const rightOrdered = rows.map(r => r.cells[1].textContent.trim());
   const indices      = rightOrdered.map((_, i) => i);

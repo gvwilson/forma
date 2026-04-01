@@ -3,9 +3,9 @@ import { addHelpButton } from './help.js';
 import { mk } from './utils.js';
 
 const HELP_TEXT = {
-  en: 'Select the answer you think is correct by clicking on it. Your answer is submitted immediately and you\'ll see whether you were right.',
-  fr: 'Cliquez sur la réponse que vous pensez correcte. Votre réponse est soumise immédiatement et vous verrez si vous aviez raison.',
-  es: 'Seleccione la respuesta que crea correcta haciendo clic en ella. Su respuesta se envía de inmediato y verá si acertó.',
+  en: 'Select the answer you think is correct by clicking on it. You\'ll see whether you were right. Click Try Again to reset and retry.',
+  fr: 'Cliquez sur la réponse que vous pensez correcte. Vous verrez si vous aviez raison. Cliquez sur Réessayer pour recommencer.',
+  es: 'Seleccione la respuesta que crea correcta haciendo clic en ella. Verá si acertó. Haga clic en Reintentar para volver a intentarlo.',
 };
 
 function render({ model, el }) {
@@ -20,6 +20,20 @@ function render({ model, el }) {
 
   const feedbackEl = mk('div'); feedbackEl.style.display = 'none';
   const explanationEl = mk('div'); explanationEl.style.display = 'none';
+  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again');
+  tryAgainBtn.style.display = 'none';
+  tryAgainBtn.addEventListener('click', () => {
+    answered = false;
+    [...opts.children].forEach(opt => {
+      opt.classList.remove('forma-answered', 'forma-correct', 'forma-incorrect', 'forma-faded');
+      opt.querySelector('input').checked = false;
+    });
+    feedbackEl.style.display = 'none';
+    explanationEl.style.display = 'none';
+    tryAgainBtn.style.display = 'none';
+    model.set('value', { selected: null, correct: false, answered: false });
+    model.save_changes();
+  });
 
   options.forEach((text, i) => {
     const div = mk('div', 'forma-option');
@@ -41,6 +55,7 @@ function render({ model, el }) {
       const explanations = model.get('explanations');
       const expl = (explanations && explanations[i]) || model.get('explanation');
       if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
+      tryAgainBtn.style.display = 'inline-block';
       model.set('value', { selected: i, correct: ok, answered: true });
       model.save_changes();
     };
@@ -50,7 +65,7 @@ function render({ model, el }) {
     opts.appendChild(div);
   });
 
-  container.append(opts, feedbackEl, explanationEl);
+  container.append(opts, feedbackEl, explanationEl, tryAgainBtn);
   addHelpButton(container, model.get('lang'), HELP_TEXT);
   el.appendChild(container);
 }

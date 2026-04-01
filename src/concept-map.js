@@ -219,7 +219,11 @@ function render({ model, el }) {
 export function parseHTML(div) {
   const question = div.querySelector('p')?.textContent.trim() ?? '';
   const concepts = [], terms = [];
-  const correct_edges = [...div.querySelectorAll('tr')].map(r => {
+  // Skip header rows (from <thead> or containing <th> cells) so that
+  // Markdown-generated tables with a required header row parse correctly.
+  const correct_edges = [...div.querySelectorAll('tr')].filter(
+    r => r.closest('thead') === null && r.querySelector('th') === null
+  ).map(r => {
     const from  = r.cells[0].textContent.trim();
     const label = r.cells[1].textContent.trim();
     const to    = r.cells[2].textContent.trim();
