@@ -1,0 +1,269 @@
+/*
+ * Forma widget styles — loaded alongside chota.css.
+ *
+ * To customize all widgets, override a small number of vars on :root:
+ *
+ *   Chota vars (affect chota UI and forma widgets):
+ *     --color-primary      accent color for buttons, borders, highlights
+ *     --bg-color           page/widget background
+ *     --bg-secondary-color muted background, secondary buttons
+ *     --color-lightGrey    border color
+ *     --color-grey         secondary text
+ *     --color-error        danger/error color
+ *     --color-success      correct/success color
+ *
+ *   Forma-only vars (override forma widgets only, take precedence over chota):
+ *     --forma-primary      (default: --color-primary)
+ *     --forma-bg           (default: --bg-color)
+ *     --forma-border       (default: --color-lightGrey)
+ *     --forma-radius       corner rounding (default: 4px)
+ *     --forma-accent       hover/highlight tint (default: --bg-secondary-color)
+ */
+
+.forma {
+  /* Internal aliases: forma var → chota var → hardcoded default.
+   * Widget rules use var(--pri), var(--bg), etc. for brevity. */
+  --pri:  var(--forma-primary,       var(--color-primary,       #14854f));
+  --pfg:  var(--forma-primary-fg,    #fff);
+  --bg:   var(--forma-bg,            var(--bg-color,            #fff));
+  --txt:  var(--forma-text,          var(--font-color,          #333));
+  --bdr:  var(--forma-border,        var(--color-lightGrey,     #d2d6dd));
+  --mut:  var(--forma-muted,         var(--bg-secondary-color,  #f3f3f6));
+  --sec:  var(--forma-secondary,     var(--bg-secondary-color,  #f3f3f6));
+  --dim:  var(--forma-text-muted,    var(--color-grey,          #747681));
+  --err:  var(--forma-danger,        var(--color-error,         #d43939));
+  --ok:   var(--forma-correct-color, var(--color-success,       #28bd14));
+  --acc:  var(--forma-accent,           var(--bg-secondary-color,  #f3f3f6));
+  --rad:  var(--forma-radius,           4px);
+  /* State colors */
+  --cbg:  var(--forma-correct-bg,       #d4edda);
+  --ibg:  var(--forma-incorrect-bg,     #f8d7da);
+  --drbg: var(--forma-draggable-bg,     var(--bg-secondary-color,  #f3f3f6));
+  --drbd: var(--forma-draggable-border, var(--color-primary,        #14854f));
+  --dpbg: var(--forma-drop-bg,          var(--bg-secondary-color,  #f3f3f6));
+  --dpbd: var(--forma-drop-border,      var(--color-darkGrey,       #3f4144));
+
+  position: relative;
+  padding: 12px;
+  border: 1px solid var(--bdr);
+  border-radius: var(--rad);
+}
+
+/* Dark mode overrides */
+.dark .forma, .dark-theme .forma, [data-theme="dark"] .forma {
+  --forma-bg:              #1e1e2e;
+  --forma-text:            #cdd6f4;
+  --forma-text-muted:      #9399b2;
+  --forma-border:          #45475a;
+  --forma-accent:          #313244;
+  --forma-muted:           #181825;
+  --forma-secondary:       #313244;
+  --forma-correct-bg:      #14532d;
+  --forma-correct-color:   #4ade80;
+  --forma-incorrect-bg:    #450a0a;
+  --forma-draggable-bg:    #431407;
+  --forma-draggable-border:#ea580c;
+  --forma-drop-bg:         #422006;
+  --forma-drop-border:     #ca8a04;
+}
+
+.forma-question     { font-size: 1.1em; margin-bottom: 12px; }
+.forma-instructions { font-size: 0.9em; color: var(--dim); margin-bottom: 12px; }
+
+/* Buttons */
+.forma-btn {
+  padding: 10px 20px; border: none; border-radius: var(--rad);
+  font: inherit; cursor: pointer;
+}
+.forma-btn-primary   { background: var(--pri); color: var(--pfg); }
+.forma-btn-secondary { background: var(--sec); color: var(--txt); border: 1px solid var(--bdr); }
+.forma-btn-danger    { background: var(--err); color: var(--pfg); }
+.forma-btn-primary:hover:not(:disabled),
+.forma-btn-danger:hover:not(:disabled)    { opacity: 0.9; }
+.forma-btn-secondary:hover:not(:disabled) { opacity: 0.85; }
+.forma-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Feedback */
+.forma-feedback  { margin-top: 12px; }
+.forma-correct   { color: var(--ok); }
+.forma-incorrect { color: var(--err); }
+
+/* Explanation block */
+.forma-explanation {
+  padding: 10px; margin-top: 10px;
+  background: var(--mut); border-left: 4px solid var(--pri); border-radius: var(--rad);
+}
+
+/* Shared: padded bordered boxes used by multiple widgets */
+.forma-option,
+.forma-item-fixed,
+.forma-drop-zone,
+.forma-ordering-item,
+.forma-item-draggable {
+  padding: 10px;
+  border: 2px solid var(--bdr);
+  border-radius: var(--rad);
+}
+
+/* Shared: correct/incorrect state applied across widget item types */
+.forma-option.forma-correct,
+.forma-item-fixed.forma-correct,
+.forma-drop-zone.forma-correct,
+.forma-ordering-item.forma-correct { background: var(--cbg); border-color: var(--ok); }
+
+.forma-option.forma-incorrect,
+.forma-item-fixed.forma-incorrect,
+.forma-drop-zone.forma-incorrect,
+.forma-ordering-item.forma-incorrect { background: var(--ibg); border-color: var(--err); }
+
+/* Multiple choice */
+.forma-options { margin-bottom: 12px; }
+.forma-option  { margin: 6px 0; cursor: pointer; transition: background .2s, border-color .2s; }
+.forma-option:hover:not(.forma-answered) { background: var(--acc); border-color: var(--pri); }
+.forma-option.forma-answered { cursor: not-allowed; }
+.forma-option.forma-faded    { opacity: .5; }
+
+/* Matching */
+.forma-matching-three-col {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 16px; row-gap: 8px; margin-bottom: 16px; align-items: stretch;
+}
+.forma-item-fixed { background: var(--acc); border-color: var(--pri); }
+
+/* Drop zones */
+.forma-drop-zone {
+  min-height: 40px; background: var(--mut); border-style: dashed;
+  text-align: center; color: var(--dim); font-style: italic;
+  cursor: pointer; transition: all .2s;
+}
+.forma-drop-zone.forma-filled { background: var(--sec); border-style: solid; color: inherit; font-style: normal; text-align: left; }
+.forma-drop-zone.forma-drop-target,
+.forma-label-drop-zone.forma-drop-target { background: var(--dpbg); border-color: var(--dpbd); }
+
+.forma-item-draggable { background: var(--drbg); border-color: var(--drbd); }
+
+/* Ordering */
+.forma-ordering-items { margin-bottom: 16px; }
+.forma-ordering-item  { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.forma-ordering-item.forma-drop-target { background: var(--dpbg); border-style: dashed; }
+.forma-ordering-text  { flex: 1; }
+
+/* Shared: drag cursor and dragging state */
+.forma-ordering-item,
+.forma-item-draggable,
+.forma-label-num,
+.forma-label-badge     { cursor: grab; }
+.forma-ordering-item:active,
+.forma-item-draggable:active,
+.forma-label-num:active,
+.forma-label-badge:active { cursor: grabbing; }
+.forma-ordering-item.forma-dragging,
+.forma-item-draggable.forma-dragging,
+.forma-label-num.forma-dragging,
+.forma-label-badge.forma-dragging { opacity: .5; }
+
+/* Shared: circular position/label badges */
+.forma-position,
+.forma-label-num,
+.forma-label-badge {
+  background: var(--pri); color: var(--pfg);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.forma-position,
+.forma-label-num  { min-width: 30px; height: 30px; }
+.forma-label-badge { min-width: 24px; height: 24px; font-size: 0.8em; }
+.forma-label-badge.forma-correct   { background: var(--ok);  color: white; }
+.forma-label-badge.forma-incorrect { background: var(--err); color: white; }
+
+/* Labeling */
+.forma-labeling-area   { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px; }
+.forma-labeling-labels,
+.forma-labeling-text   { display: flex; flex-direction: column; gap: 10px; }
+.forma-labeling-title  { color: var(--dim); margin-bottom: 6px; }
+.forma-label-item      { display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: var(--rad); }
+.forma-text-lines      { display: flex; flex-direction: column; gap: 8px; }
+.forma-text-line       { display: flex; align-items: flex-start; gap: 8px; }
+.forma-label-drop-zone {
+  min-width: 60px; min-height: 30px; padding: 4px;
+  background: var(--mut); border: 2px dashed var(--bdr); border-radius: var(--rad);
+  display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; flex-shrink: 0;
+}
+.forma-text-content { flex: 1; padding: 4px 0; line-height: 1.5; }
+
+/* Flashcard */
+.forma-card {
+  min-height: 105px; padding: 24px 15px; border-radius: var(--rad);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2em; text-align: center; margin-bottom: 12px; transition: all .3s;
+}
+.forma-card-front { background: var(--acc); border: 2px solid var(--pri); }
+.forma-card-back  { background: var(--mut); border: 2px solid var(--bdr); }
+.forma-rating-btns   { display: flex; gap: 8px; margin-bottom: 12px; }
+.forma-progress      { height: 6px; background: var(--mut); border-radius: 4px; margin-bottom: 10px; }
+.forma-progress-fill { height: 100%; background: var(--pri); border-radius: 4px; transition: width .3s; }
+
+/* Concept map */
+.forma-cm-workspace {
+  position: relative; height: 360px;
+  border: 1px solid var(--bdr); border-radius: var(--rad);
+  margin-bottom: 12px; overflow: hidden; background: var(--mut);
+}
+.forma-cm-svg  { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
+.forma-cm-node {
+  position: absolute; transform: translate(-50%, -50%);
+  padding: 8px 14px; background: var(--bg); border: 2px solid var(--pri);
+  border-radius: var(--rad); cursor: move; user-select: none; z-index: 1; white-space: nowrap;
+}
+.forma-cm-node.forma-cm-pending { box-shadow: 0 0 0 3px var(--pri); background: var(--acc); }
+.forma-cm-terms { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.forma-cm-term {
+  padding: 5px 14px; border: 2px solid var(--bdr); border-radius: 20px;
+  background: var(--mut); cursor: pointer; font: inherit; font-size: 0.9em; transition: all .15s;
+}
+.forma-cm-term:hover:not(:disabled)    { border-color: var(--pri); background: var(--acc); }
+.forma-cm-term.forma-cm-term-selected { background: var(--pri); color: var(--pfg); border-color: var(--pri); }
+.forma-cm-term:disabled               { opacity: 0.45; cursor: not-allowed; }
+.forma-cm-edge-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.forma-cm-edge-row  {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px; background: var(--mut); border-radius: var(--rad); font-size: 0.9em;
+}
+.forma-cm-edge-label  { padding: 2px 8px; background: var(--acc); border-radius: 10px; font-size: 0.85em; }
+.forma-cm-edge-remove { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--dim); padding: 2px 4px; border-radius: 4px; }
+.forma-cm-edge-remove:hover { color: var(--err); background: var(--ibg); }
+
+/* Numeric entry */
+.forma-numeric-row   { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.forma-numeric-input {
+  padding: 8px 12px; border: 2px solid var(--bdr); border-radius: var(--rad);
+  font: inherit; font-size: 1em; width: 10em;
+}
+.forma-numeric-input:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Shared: monospace display blocks */
+.forma-code,
+.forma-output {
+  padding: 12px 16px;
+  background: var(--mut); border-radius: var(--rad);
+  font-family: monospace; font-size: 0.9em; white-space: pre; overflow-x: auto;
+}
+.forma-code   { border: 1px solid var(--bdr); margin-bottom: 14px; }
+.forma-output { border-left: 4px solid var(--pri); margin-top: 10px; }
+.forma-reveal-btn { margin-top: 12px; }
+
+/* Help button and popup */
+.forma-help-btn {
+  position: absolute; top: 8px; right: 8px;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--bdr); background: var(--mut); color: var(--dim);
+  font: 0.8em/1 inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0; z-index: 10;
+}
+.forma-help-btn:hover { background: var(--acc); border-color: var(--pri); color: var(--txt); }
+.forma-help-popup {
+  position: absolute; top: calc(22px + 12px); right: 0;
+  min-width: 200px; max-width: 320px; padding: 10px 14px;
+  background: var(--bg); border: 1px solid var(--bdr); border-radius: var(--rad);
+  font-size: 0.9em; line-height: 1.5; z-index: 20;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}

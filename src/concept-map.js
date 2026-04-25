@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk } from './utils.js';
+import { mk, initWidget } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Select a relationship term, then click two concept nodes to draw a directed connection between them. Drag concept nodes to rearrange the layout. Click × on a connection to remove it. Click Check Map when done.',
@@ -19,9 +18,7 @@ let uid = 0;
 
 function render({ model, el }) {
   const id = ++uid;
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  const container = initWidget(el, model.get('question'));
   container.appendChild(mk('div', 'forma-instructions', 'Select a relationship term, then click two concepts to connect them. Drag concepts to rearrange.'));
 
   const concepts = model.get('concepts');

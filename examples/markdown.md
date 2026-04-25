@@ -112,6 +112,21 @@ A list has 6 rows and 7 columns. How many elements does it contain?
 
 </div>
 
+## Show/Hide
+
+Run the code below and predict the output. When you are ready, expand the block to check.
+
+```
+words = ["apple", "banana", "cherry"]
+print(words[1])
+```
+
+<div class="forma-show-hide" data-lang="en" markdown="1">
+
+**banana** - list indices start at 0, so index 1 is the second item.
+
+</div>
+
 ## Predict Then Check
 
 <div class="forma-predict-then-check" data-lang="en" markdown="1">

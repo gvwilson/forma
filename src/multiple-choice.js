@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk } from './utils.js';
+import { mk, initWidget, showFeedback, createOptions } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Select the answer you think is correct by clicking on it. You\'ll see whether you were right. Click Try Again to reset and retry.',
@@ -9,12 +8,8 @@ const HELP_TEXT = {
 };
 
 function render({ model, el }) {
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  const container = initWidget(el, model.get('question'));
 
-  const opts = mk('div', 'forma-options');
-  const options = model.get('options');
   const correct = model.get('correct_answer');
   let answered = false;
 
@@ -22,6 +17,22 @@ function render({ model, el }) {
   const explanationEl = mk('div'); explanationEl.style.display = 'none';
   const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again');
   tryAgainBtn.style.display = 'none';
+
+  const opts = createOptions(model.get('options'), (i, radio, opts) => {
+    if (answered) return;
+    radio.checked = true;
+    answered = true;
+    [...opts.children].forEach((opt, j) => {
+      opt.classList.add('forma-answered', j === correct ? 'forma-correct' : j === i ? 'forma-incorrect' : 'forma-faded');
+    });
+    const ok = i === correct;
+    const explanations = model.get('explanations');
+    showFeedback(ok, feedbackEl, explanationEl, (explanations && explanations[i]) || model.get('explanation'));
+    tryAgainBtn.style.display = 'inline-block';
+    model.set('value', { selected: i, correct: ok, answered: true });
+    model.save_changes();
+  });
+
   tryAgainBtn.addEventListener('click', () => {
     answered = false;
     [...opts.children].forEach(opt => {
@@ -33,36 +44,6 @@ function render({ model, el }) {
     tryAgainBtn.style.display = 'none';
     model.set('value', { selected: null, correct: false, answered: false });
     model.save_changes();
-  });
-
-  options.forEach((text, i) => {
-    const div = mk('div', 'forma-option');
-    const radio = mk('input'); radio.type = 'radio'; radio.name = 'answer'; radio.value = i; radio.id = `opt-${i}`; radio.style.marginRight = '10px';
-    const lbl = mk('label'); lbl.htmlFor = `opt-${i}`; lbl.textContent = text; lbl.style.cursor = 'pointer';
-    div.append(radio, lbl);
-
-    const select = () => {
-      if (answered) return;
-      radio.checked = true;
-      answered = true;
-      [...opts.children].forEach((opt, j) => {
-        opt.classList.add('forma-answered', j === correct ? 'forma-correct' : j === i ? 'forma-incorrect' : 'forma-faded');
-      });
-      const ok = i === correct;
-      feedbackEl.textContent = ok ? '✓ Correct!' : '✗ Incorrect';
-      feedbackEl.className = `forma-feedback ${ok ? 'forma-correct' : 'forma-incorrect'}`;
-      feedbackEl.style.display = 'block';
-      const explanations = model.get('explanations');
-      const expl = (explanations && explanations[i]) || model.get('explanation');
-      if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
-      tryAgainBtn.style.display = 'inline-block';
-      model.set('value', { selected: i, correct: ok, answered: true });
-      model.save_changes();
-    };
-
-    div.addEventListener('click', select);
-    radio.addEventListener('change', select);
-    opts.appendChild(div);
   });
 
   container.append(opts, feedbackEl, explanationEl, tryAgainBtn);

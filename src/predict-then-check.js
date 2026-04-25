@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk } from './utils.js';
+import { mk, initWidget, showFeedback, createOptions } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Read the code, predict what it will output, then select your answer. Use the Reveal Output button to confirm by running it yourself. Click Try Again to reset and retry.',
@@ -9,11 +8,8 @@ const HELP_TEXT = {
 };
 
 function render({ model, el }) {
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  const container = initWidget(el, model.get('question'));
 
-  // Code block display
   const code = model.get('code');
   if (code) {
     const pre = mk('pre', 'forma-code');
@@ -23,8 +19,6 @@ function render({ model, el }) {
     container.appendChild(pre);
   }
 
-  const opts = mk('div', 'forma-options');
-  const options = model.get('options');
   const correct = model.get('correct_answer');
   const explanations = model.get('explanations') || [];
   let answered = false;
@@ -34,6 +28,21 @@ function render({ model, el }) {
   let revealBtn = null, outputEl = null;
   const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again');
   tryAgainBtn.style.display = 'none';
+
+  const opts = createOptions(model.get('options'), (i, radio, opts) => {
+    if (answered) return;
+    radio.checked = true;
+    answered = true;
+    [...opts.children].forEach((opt, j) => {
+      opt.classList.add('forma-answered', j === correct ? 'forma-correct' : j === i ? 'forma-incorrect' : 'forma-faded');
+    });
+    const ok = i === correct;
+    showFeedback(ok, feedbackEl, explanationEl, explanations[i] || model.get('explanation'));
+    tryAgainBtn.style.display = 'inline-block';
+    model.set('value', { selected: i, correct: ok, answered: true });
+    model.save_changes();
+  });
+
   tryAgainBtn.addEventListener('click', () => {
     answered = false;
     [...opts.children].forEach(opt => {
@@ -49,35 +58,6 @@ function render({ model, el }) {
     model.save_changes();
   });
 
-  options.forEach((text, i) => {
-    const div = mk('div', 'forma-option');
-    const radio = mk('input'); radio.type = 'radio'; radio.name = 'answer'; radio.value = i; radio.id = `opt-${i}`; radio.style.marginRight = '10px';
-    const lbl = mk('label'); lbl.htmlFor = `opt-${i}`; lbl.textContent = text; lbl.style.cursor = 'pointer';
-    div.append(radio, lbl);
-
-    const select = () => {
-      if (answered) return;
-      radio.checked = true;
-      answered = true;
-      [...opts.children].forEach((opt, j) => {
-        opt.classList.add('forma-answered', j === correct ? 'forma-correct' : j === i ? 'forma-incorrect' : 'forma-faded');
-      });
-      const ok = i === correct;
-      feedbackEl.textContent = ok ? '✓ Correct!' : '✗ Incorrect';
-      feedbackEl.className = `forma-feedback ${ok ? 'forma-correct' : 'forma-incorrect'}`;
-      feedbackEl.style.display = 'block';
-      const expl = explanations[i] || model.get('explanation');
-      if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
-      tryAgainBtn.style.display = 'inline-block';
-      model.set('value', { selected: i, correct: ok, answered: true });
-      model.save_changes();
-    };
-
-    div.addEventListener('click', select);
-    radio.addEventListener('change', select);
-    opts.appendChild(div);
-  });
-
   container.append(opts, feedbackEl, explanationEl, tryAgainBtn);
 
   // Reveal button lets the learner verify by seeing/running the actual output
@@ -87,12 +67,7 @@ function render({ model, el }) {
     outputEl = mk('pre', 'forma-output');
     outputEl.style.display = 'none';
     outputEl.textContent = output;
-
-    revealBtn.addEventListener('click', () => {
-      outputEl.style.display = 'block';
-      revealBtn.disabled = true;
-    });
-
+    revealBtn.addEventListener('click', () => { outputEl.style.display = 'block'; revealBtn.disabled = true; });
     container.append(revealBtn, outputEl);
   }
 

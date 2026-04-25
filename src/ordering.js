@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk, shuffle } from './utils.js';
+import { mk, initWidget, shuffle, createSubmitRow } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Drag the items up or down to arrange them in the correct order. Click Check Order to submit your answer, Reset to shuffle and start over, or Try Again after submitting.',
@@ -9,9 +8,7 @@ const HELP_TEXT = {
 };
 
 function render({ model, el }) {
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  const container = initWidget(el, model.get('question'));
   container.appendChild(mk('div', 'forma-instructions', 'Drag items to arrange them in the correct order:'));
 
   const correct = model.get('items');
@@ -44,10 +41,10 @@ function render({ model, el }) {
 
   renderItems();
 
-  const btnRow = mk('div'); btnRow.style.marginBottom = '16px';
-  const checkBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Order'); checkBtn.style.marginRight = '12px';
-  const resetBtn = mk('button', 'forma-btn forma-btn-secondary', 'Reset'); resetBtn.style.marginRight = '12px';
-  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again'); tryAgainBtn.style.display = 'none';
+  const { btnRow, submitBtn: checkBtn, tryAgainBtn } = createSubmitRow('Check Order');
+  const resetBtn = mk('button', 'forma-btn forma-btn-secondary', 'Reset');
+  resetBtn.style.marginRight = '12px';
+  btnRow.style.marginBottom = '16px';
 
   checkBtn.addEventListener('click', () => {
     if (submitted) return;

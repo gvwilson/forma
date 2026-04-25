@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk } from './utils.js';
+import { mk, initWidget, setupDropZone, createSubmitRow } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Drag the numbered labels from the left panel and drop them onto the correct text lines on the right. You can remove a placed label by dragging it outside the text area. Click Check Labels when done. Click Try Again to reset and retry.',
@@ -9,9 +8,7 @@ const HELP_TEXT = {
 };
 
 function render({ model, el }) {
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  const container = initWidget(el, model.get('question'));
   container.appendChild(mk('div', 'forma-instructions', 'Drag label numbers to text lines. Drag outside to remove.'));
 
   const labels = model.get('labels'), textLines = model.get('text_lines'), correctLabels = model.get('correct_labels');
@@ -56,11 +53,7 @@ function render({ model, el }) {
   textLines.forEach((text, lineIdx) => {
     const line = mk('div', 'forma-text-line');
     const zone = mk('div', 'forma-label-drop-zone');
-    zone.addEventListener('dragover', e => { if (submitted) return; e.preventDefault(); zone.classList.add('forma-drop-target'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('forma-drop-target'));
-    zone.addEventListener('drop', e => {
-      if (submitted) return;
-      e.preventDefault(); zone.classList.remove('forma-drop-target');
+    setupDropZone(zone, e => {
       let li, from = null;
       const raw = e.dataTransfer.getData('text/plain');
       try { const d = JSON.parse(raw); if (typeof d === 'object' && d !== null) { li = d.li; from = d.from; } else { li = d; } } catch { li = parseInt(raw); }
@@ -72,7 +65,7 @@ function render({ model, el }) {
       if (!placed[lineIdx]) placed[lineIdx] = [];
       if (!placed[lineIdx].includes(li)) placed[lineIdx].push(li);
       renderBadges(zone, lineIdx); sync();
-    });
+    }, () => submitted);
     line.append(zone, mk('div', 'forma-text-content', text));
     linesEl.appendChild(line);
   });
@@ -81,9 +74,8 @@ function render({ model, el }) {
   area.append(labelsCol, textCol);
   container.appendChild(area);
 
-  const btnRow = mk('div'); btnRow.style.marginTop = '16px';
-  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Labels'); submitBtn.style.marginRight = '12px';
-  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again'); tryAgainBtn.style.display = 'none';
+  const { btnRow, submitBtn, tryAgainBtn } = createSubmitRow('Check Labels');
+  btnRow.style.marginTop = '16px';
 
   submitBtn.addEventListener('click', () => {
     if (submitted) return;

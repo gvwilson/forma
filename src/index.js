@@ -1,4 +1,5 @@
 import { createModel } from './utils.js';
+import { mountShowHide } from './show-hide.js';
 import conceptMap,      { parseHTML as parseConceptMap }      from './concept-map.js';
 import flashcard,       { parseHTML as parseFlashcard }       from './flashcard.js';
 import labeling,        { parseHTML as parseLabeling }        from './labeling.js';
@@ -8,7 +9,23 @@ import numericEntry,    { parseHTML as parseNumericEntry }    from './numeric-en
 import ordering,        { parseHTML as parseOrdering }        from './ordering.js';
 import predictThenCheck,{ parseHTML as parsePredictThenCheck }from './predict-then-check.js';
 
-export { createModel };
+export { createModel, mountShowHide };
+
+// Set theme variables on the document root.  Accepts up to five keys:
+//   primary    — main color for buttons, active borders, highlights
+//   background — widget background color
+//   text       — text color
+//   border     — border color
+//   radius     — corner rounding (e.g. '4px', '0.5rem')
+// Any key that is undefined is left unchanged.
+export function setTheme({ primary, background, text, border, radius } = {}) {
+  const root = document.documentElement;
+  if (primary    !== undefined) root.style.setProperty('--forma-primary',    primary);
+  if (background !== undefined) root.style.setProperty('--forma-bg',         background);
+  if (text       !== undefined) root.style.setProperty('--forma-text',       text);
+  if (border     !== undefined) root.style.setProperty('--forma-border',     border);
+  if (radius     !== undefined) root.style.setProperty('--forma-radius',     radius);
+}
 
 export function renderConceptMap(el, config) {
   conceptMap.render({ model: createModel(config), el });
@@ -57,6 +74,7 @@ const WIDGETS = {
 // Find all widget divs under `root`, parse their HTML configuration, replace each
 // div with the live rendered widget.  Defaults to scanning the whole document.
 export function autoMount(root = document) {
+  mountShowHide(root);
   for (const [cls, [render, parse]] of Object.entries(WIDGETS)) {
     root.querySelectorAll(`.${cls}`).forEach(div => {
       const container = document.createElement('div');

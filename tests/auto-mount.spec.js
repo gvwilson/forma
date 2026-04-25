@@ -1,6 +1,41 @@
 import { test, expect } from '@playwright/test';
 
 // ---------------------------------------------------------------------------
+// Show/hide
+// ---------------------------------------------------------------------------
+test.describe('autoMount: ShowHide', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/tests/fixtures/mount-show-hide.html');
+  });
+
+  test('original divs are replaced by details elements', async ({ page }) => {
+    await expect(page.locator('.forma-show-hide')).toHaveCount(0);
+    await expect(page.locator('details.explanation')).toHaveCount(2);
+  });
+
+  test('content from the div is inside the details element', async ({ page }) => {
+    await expect(page.locator('details.explanation').first().locator('p')).toHaveText('The answer is 42.');
+  });
+
+  test('default summary text is "Show explanation"', async ({ page }) => {
+    await expect(page.locator('details.explanation').first().locator('summary')).toHaveText('Show explanation');
+  });
+
+  test('data-summary attribute overrides the summary text', async ({ page }) => {
+    await expect(page.locator('details.explanation').nth(1).locator('summary')).toHaveText('Show hint');
+  });
+
+  test('details is closed by default', async ({ page }) => {
+    await expect(page.locator('details.explanation').first()).not.toHaveAttribute('open');
+  });
+
+  test('clicking summary opens the details block', async ({ page }) => {
+    await page.locator('details.explanation').first().locator('summary').click();
+    await expect(page.locator('details.explanation').first()).toHaveAttribute('open', '');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Multiple choice
 // ---------------------------------------------------------------------------
 test.describe('autoMount: MultipleChoiceWidget', () => {

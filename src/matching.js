@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk, shuffle } from './utils.js';
+import { mk, initWidget, shuffle, setupDropZone, createSubmitRow } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Drag items from the right column and drop them into the matching slots in the middle column. Click a placed item to remove it and try again. All items must be matched before you can check your answers. Click Try Again to reset and retry.',
@@ -9,9 +8,7 @@ const HELP_TEXT = {
 };
 
 function render({ model, el }) {
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  const container = initWidget(el, model.get('question'));
   container.appendChild(mk('div', 'forma-instructions', 'Drag labels from the right column to match with items on the left:'));
 
   const left = model.get('left'), right = model.get('right');
@@ -25,11 +22,7 @@ function render({ model, el }) {
 
   const zones = left.map((_, li) => {
     const z = mk('div', 'forma-drop-zone', '(drop here)');
-    z.addEventListener('dragover', e => { if (submitted) return; e.preventDefault(); z.classList.add('forma-drop-target'); });
-    z.addEventListener('dragleave', () => z.classList.remove('forma-drop-target'));
-    z.addEventListener('drop', e => {
-      if (submitted) return;
-      e.preventDefault(); z.classList.remove('forma-drop-target');
+    setupDropZone(z, e => {
       const ri = parseInt(e.dataTransfer.getData('text/plain'));
       z.textContent = right[ri]; z.className = 'forma-drop-zone forma-filled';
       matches[li] = ri; sync();
@@ -38,7 +31,7 @@ function render({ model, el }) {
         z.textContent = '(drop here)'; z.className = 'forma-drop-zone';
         delete matches[li]; sync();
       });
-    });
+    }, () => submitted);
     return z;
   });
 
@@ -54,9 +47,8 @@ function render({ model, el }) {
   left.forEach((_, i) => grid.append(leftItems[i], zones[i], rightItems[i]));
   container.appendChild(grid);
 
-  const btnRow = mk('div'); btnRow.style.marginBottom = '16px';
-  const submitBtn = mk('button', 'forma-btn forma-btn-primary', 'Check Answers'); submitBtn.style.marginRight = '12px';
-  const tryAgainBtn = mk('button', 'forma-btn forma-btn-secondary', 'Try Again'); tryAgainBtn.style.display = 'none';
+  const { btnRow, submitBtn, tryAgainBtn } = createSubmitRow('Check Answers');
+  btnRow.style.marginBottom = '16px';
 
   submitBtn.addEventListener('click', () => {
     if (submitted) return;

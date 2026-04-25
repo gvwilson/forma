@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk, shuffle } from './utils.js';
+import { mk, initWidget, shuffle } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Read the front of each card, then click Flip to see the answer. Rate how well you knew it: Got it (you knew it), Almost (close but not quite), or No (didn\'t know it). Cards rated Almost or No will reappear until you get them right.',
@@ -9,11 +8,7 @@ const HELP_TEXT = {
 };
 
 function render({ model, el }) {
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-
-  const q = model.get('question');
-  if (q) container.appendChild(mk('div', 'forma-question', q));
+  const container = initWidget(el, model.get('question'));
 
   const cards = model.get('cards');
   const total = cards.length;

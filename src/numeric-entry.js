@@ -1,6 +1,5 @@
-import styles from './styles.css';
 import { addHelpButton } from './help.js';
-import { mk } from './utils.js';
+import { mk, initWidget, showFeedback } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Type a number and click Submit to check your answer. Click Try Again to reset and retry.',
@@ -13,9 +12,7 @@ const HELP_TEXT = {
 const DEFAULT_TOLERANCE = 1e-9;
 
 function render({ model, el }) {
-  const s = mk('style'); s.textContent = styles; el.appendChild(s);
-  const container = mk('div', 'forma');
-  container.appendChild(mk('div', 'forma-question', model.get('question')));
+  const container = initWidget(el, model.get('question'));
 
   const input = mk('input');
   input.type = 'number';
@@ -39,15 +36,8 @@ function render({ model, el }) {
     answered = true;
     input.disabled = true;
     submitBtn.disabled = true;
-
     const ok = Math.abs(entered - correct) < tolerance;
-    feedbackEl.textContent = ok ? '✓ Correct!' : '✗ Incorrect';
-    feedbackEl.className = `forma-feedback ${ok ? 'forma-correct' : 'forma-incorrect'}`;
-    feedbackEl.style.display = 'block';
-
-    const expl = model.get('explanation');
-    if (expl) { explanationEl.textContent = expl; explanationEl.className = 'forma-explanation'; explanationEl.style.display = 'block'; }
-
+    showFeedback(ok, feedbackEl, explanationEl, model.get('explanation'));
     tryAgainBtn.style.display = 'inline-block';
     model.set('value', { entered, correct, ok, answered: true });
     model.save_changes();
