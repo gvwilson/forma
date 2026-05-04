@@ -1,4 +1,3 @@
-import chotaCSS from './chota.css';
 import formaCSS from './forma.css';
 
 export function mk(tag, cls, txt) {
@@ -13,6 +12,15 @@ export function shuffle(arr) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
+}
+
+// Default KaTeX delimiter pair: inline $...$.
+export const DEFAULT_MATH_DELIMITERS = [{ left: '$', right: '$', display: false }];
+
+// Call KaTeX's renderMathInElement on el if it is available.
+// Falls back to DEFAULT_MATH_DELIMITERS when delimiters is null or undefined.
+export function renderMath(el, delimiters) {
+  window.renderMathInElement?.(el, { delimiters: delimiters ?? DEFAULT_MATH_DELIMITERS });
 }
 
 // Creates a minimal anywidget-compatible model backed by a plain JS object.
@@ -32,7 +40,7 @@ export function createModel(data) {
 // the end of render() after populating it.
 export function initWidget(el, question) {
   const s = mk('style');
-  s.textContent = chotaCSS + formaCSS;
+  s.textContent = formaCSS;
   el.appendChild(s);
   const container = mk('div', 'forma');
   if (question) container.appendChild(mk('div', 'forma-question', question));

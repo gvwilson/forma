@@ -1,5 +1,5 @@
 import { addHelpButton } from './help.js';
-import { mk, initWidget, shuffle } from './utils.js';
+import { mk, initWidget, shuffle, renderMath, DEFAULT_MATH_DELIMITERS } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Read the front of each card, then click Flip to see the answer. Rate how well you knew it: Got it (you knew it), Almost (close but not quite), or No (didn\'t know it). Cards rated Almost or No will reappear until you get them right.',
@@ -28,8 +28,12 @@ function render({ model, el }) {
   const counterEl = mk('div', 'forma-instructions');
   container.appendChild(counterEl);
 
-  // Card face
+  // Card face — cardContent is a span inside the flex container so that
+  // inline text and KaTeX spans are siblings within one flex item, preventing
+  // flex layout from collapsing the whitespace between them.
   const cardEl = mk('div', 'forma-card forma-card-front');
+  const cardContent = mk('span');
+  cardEl.appendChild(cardContent);
   container.appendChild(cardEl);
 
   // Flip button
@@ -53,7 +57,8 @@ function render({ model, el }) {
   function showCard() {
     if (queue.length === 0) return;
     const idx = queue[0];
-    cardEl.textContent = cards[idx].front;
+    cardContent.textContent = cards[idx].front;
+    renderMath(cardContent, model.get('math_delimiters'));
     cardEl.className = 'forma-card forma-card-front';
     flipBtn.style.display = '';
     ratingRow.style.display = 'none';
@@ -61,7 +66,7 @@ function render({ model, el }) {
   }
 
   function showComplete() {
-    cardEl.textContent = '🎉 All cards reviewed!';
+    cardContent.textContent = '🎉 All cards reviewed!';
     cardEl.className = 'forma-card forma-card-back';
     counterEl.textContent = `Completed ${total} card${total !== 1 ? 's' : ''}.`;
     flipBtn.style.display = 'none';
@@ -80,7 +85,8 @@ function render({ model, el }) {
 
   flipBtn.addEventListener('click', () => {
     const idx = queue[0];
-    cardEl.textContent = cards[idx].back;
+    cardContent.textContent = cards[idx].back;
+    renderMath(cardContent, model.get('math_delimiters'));
     cardEl.className = 'forma-card forma-card-back';
     flipBtn.style.display = 'none';
     ratingRow.style.display = 'flex';
@@ -121,7 +127,9 @@ export function parseHTML(div) {
     front: dt.textContent.trim(),
     back:  dt.nextElementSibling?.textContent.trim() ?? '',
   }));
-  return { question, cards, shuffle: true, lang: div.dataset.lang ?? 'en' };
+  const raw = div.dataset.mathDelimiters;
+  const math_delimiters = raw ? JSON.parse(raw) : DEFAULT_MATH_DELIMITERS;
+  return { question, cards, shuffle: true, lang: div.dataset.lang ?? 'en', math_delimiters };
 }
 
 export default { render };

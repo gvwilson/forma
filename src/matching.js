@@ -1,5 +1,5 @@
 import { addHelpButton } from './help.js';
-import { mk, initWidget, shuffle, setupDropZone, createSubmitRow } from './utils.js';
+import { mk, initWidget, shuffle, setupDropZone, createSubmitRow, renderMath, DEFAULT_MATH_DELIMITERS } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Drag items from the right column and drop them into the matching slots in the middle column. Click a placed item to remove it and try again. All items must be matched before you can check your answers. Click Try Again to reset and retry.',
@@ -25,6 +25,7 @@ function render({ model, el }) {
     setupDropZone(z, e => {
       const ri = parseInt(e.dataTransfer.getData('text/plain'));
       z.textContent = right[ri]; z.className = 'forma-drop-zone forma-filled';
+      renderMath(z, model.get('math_delimiters'));
       matches[li] = ri; sync();
       z.addEventListener('click', () => {
         if (submitted) return;
@@ -106,7 +107,9 @@ export function parseHTML(div) {
   shuffle(indices);
   const right          = indices.map(i => rightOrdered[i]);
   const correct_matches = Object.fromEntries(left.map((_, i) => [i, indices.indexOf(i)]));
-  return { question, left, right, correct_matches, lang: div.dataset.lang ?? 'en' };
+  const raw = div.dataset.mathDelimiters;
+  const math_delimiters = raw ? JSON.parse(raw) : DEFAULT_MATH_DELIMITERS;
+  return { question, left, right, correct_matches, lang: div.dataset.lang ?? 'en', math_delimiters };
 }
 
 export default { render };

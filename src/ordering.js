@@ -1,5 +1,5 @@
 import { addHelpButton } from './help.js';
-import { mk, initWidget, shuffle, createSubmitRow } from './utils.js';
+import { mk, initWidget, shuffle, createSubmitRow, renderMath, DEFAULT_MATH_DELIMITERS } from './utils.js';
 
 const HELP_TEXT = {
   en: 'Drag the items up or down to arrange them in the correct order. Click Check Order to submit your answer, Reset to shuffle and start over, or Try Again after submitting.',
@@ -37,6 +37,7 @@ function render({ model, el }) {
       }
       itemsEl.appendChild(item);
     });
+    renderMath(itemsEl, model.get('math_delimiters'));
   }
 
   renderItems();
@@ -96,7 +97,9 @@ export function parseHTML(div) {
   const items    = [...div.querySelectorAll('ol li')].map(li => li.textContent.trim());
   const current_order = [...items];
   shuffle(current_order);
-  return { question, items, current_order, shuffle: true, lang: div.dataset.lang ?? 'en' };
+  const raw = div.dataset.mathDelimiters;
+  const math_delimiters = raw ? JSON.parse(raw) : DEFAULT_MATH_DELIMITERS;
+  return { question, items, current_order, shuffle: true, lang: div.dataset.lang ?? 'en', math_delimiters };
 }
 
 export default { render };

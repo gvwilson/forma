@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Forma Examples using KaTeX</title>
+    <link href="./examples.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  </head>
+  <body>
+    <main>
+      <h1>Forma Examples using KaTeX</h1>
+
+      <h2>Flashcard</h2>
+      <div class="forma-flashcard" data-lang="en">
+        <p>Common formulas</p>
+        <dl>
+          <dt>Quadratic formula: roots of $ax^2 + bx + c = 0$</dt>
+          <dd>$x = \dfrac{-b \pm \sqrt{b^2 - 4ac}}{2a}$</dd>
+          <dt>Power rule: derivative of $x^n$</dt>
+          <dd>$\dfrac{d}{dx} x^n = n x^{n-1}$</dd>
+        </dl>
+      </div>
+
+    </main>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+    <script type="module" src="../dist/forma.js"></script>
+  </body>
+</html>
